@@ -49,6 +49,7 @@ enum HelpSection: String, CaseIterable {
     case library        = "library"
     case presets        = "presets"
     case browse         = "browse"
+    case pro            = "pro"
     case shortcuts      = "shortcuts"
     case troubleshoot   = "troubleshoot"
 
@@ -58,11 +59,12 @@ enum HelpSection: String, CaseIterable {
         case .loadingImages:  return "Loading Images"
         case .screens:        return "Screen Setup"
         case .fitModes:       return "Fit Modes"
-        case .anchor:         return "Anchor Point"
+        case .anchor:         return "Anchor & Smart Crop"
         case .applying:       return "Apply Wallpapers"
         case .library:        return "Library"
         case .presets:        return "Presets"
         case .browse:         return "Browse Photos"
+        case .pro:            return "Pro Version"
         case .shortcuts:      return "Shortcuts"
         case .troubleshoot:   return "Troubleshooting"
         }
@@ -79,6 +81,7 @@ enum HelpSection: String, CaseIterable {
         case .library:        return "photo.stack"
         case .presets:        return "bookmark"
         case .browse:         return "photo.on.rectangle.angled"
+        case .pro:            return "sparkles"
         case .shortcuts:      return "keyboard"
         case .troubleshoot:   return "wrench.and.screwdriver"
         }
@@ -96,6 +99,7 @@ enum HelpSection: String, CaseIterable {
         case .library:        LibraryContent()
         case .presets:        PresetsContent()
         case .browse:         BrowseContent()
+        case .pro:            ProContent()
         case .shortcuts:      ShortcutsContent()
         case .troubleshoot:   TroubleshootContent()
         }
@@ -112,10 +116,12 @@ private struct GettingStartedContent: View {
             )
 
             HelpSteps(steps: [
-                ("photo.badge.plus",  "accent",   "Load an image", "Drag & drop, press ⌘O, or paste with ⌘V."),
-                ("display.2",         "blue",     "Screens detected", "ImageSplitter automatically detects all connected monitors."),
-                ("aspectratio",       "orange",   "Choose a fit mode", "Letterbox keeps the full image visible. Fill crops to cover every screen."),
-                ("desktopcomputer",   "green",    "Apply", "Press ⌘⇧↵ or click the Apply Wallpapers button."),
+                ("photo.badge.plus",              "accent",  "Load an image",     "Drag & drop, press ⌘O, paste with ⌘V — or browse 6 photo sources in the Browse tab."),
+                ("display.2",                     "blue",    "Screens detected",  "ImageSplitter automatically detects all connected monitors."),
+                ("aspectratio",                   "orange",  "Choose a fit mode", "Letterbox keeps the full image. Fill crops to cover every screen."),
+                ("sparkles.rectangle.stack",      "purple",  "Smart Crop",        "Click Smart Crop in the toolbar to auto-detect faces and subjects for the best cut position."),
+                ("eye",                           "teal",    "Preview",           "Click Preview to see the exact slice boundaries before committing."),
+                ("desktopcomputer",               "green",   "Apply",             "Press ⌘⇧↵ or click Apply Wallpapers."),
             ])
 
             HelpNote(text: "Your current wallpapers are automatically backed up in the Library every time you apply new ones.")
@@ -135,10 +141,10 @@ private struct LoadingImagesContent: View {
             HelpSection2(title: "Paste from Clipboard (⌘V)") {
                 HelpParagraph(text: "Copy any image (e.g. screenshot with ⌘⇧4) and paste it directly into the app. The image is imported at full resolution.")
             }
-            HelpSection2(title: "Browse Unsplash / Pexels") {
-                HelpParagraph(text: "Use the Browse tab to search millions of free high-resolution wallpapers. Click \"Use as Wallpaper\" on any photo to import it directly.")
+            HelpSection2(title: "Browse online sources (Pro)") {
+                HelpParagraph(text: "Use the Browse tab to search across Unsplash, Pexels, Wallhaven, Pixabay, NASA APOD, and Pinterest. Clicking a photo opens the Preview sheet so you can see the exact split before applying.")
             }
-            HelpNote(text: "After loading, ImageSplitter immediately generates a preview split across your screens. Nothing is changed on your desktop until you click Apply.")
+            HelpNote(text: "After loading, ImageSplitter generates a split preview. Nothing is changed on your desktop until you confirm in the Preview sheet or click Apply Wallpapers in the toolbar.")
         }
     }
 }
@@ -201,15 +207,15 @@ private struct FitModesContent: View {
 
 private struct AnchorContent: View {
     var body: some View {
-        HelpPage(title: "Anchor Point", icon: "move.3d", iconColor: .purple) {
-            HelpParagraph(text: "In Fill mode, the image must be cropped to cover all screens. The anchor point controls which part of the image is preserved (i.e. \"kept in view\") when the image is larger than the screen layout.")
+        HelpPage(title: "Anchor Point & Smart Crop", icon: "move.3d", iconColor: .purple) {
+            HelpParagraph(text: "In Fill mode, the image must be cropped to cover all screens. The anchor point controls which part of the image is preserved when the image is larger than the screen layout.")
 
             HelpSection2(title: "The 3×3 grid") {
                 HelpParagraph(text: "The toolbar shows a 3×3 grid of dots. Click any dot to set the anchor:")
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach([
                         "Top-left: preserves the top-left corner of the image.",
-                        "Center (default): crops equally on all sides — the center of the image stays centered.",
+                        "Center (default): crops equally on all sides.",
                         "Bottom-right: preserves the bottom-right corner.",
                         "And so on for all 9 positions.",
                     ], id: \.self) { line in
@@ -218,11 +224,20 @@ private struct AnchorContent: View {
                 }
             }
 
-            HelpSection2(title: "When does the anchor matter?") {
-                HelpParagraph(text: "Only in Fill mode when the image aspect ratio does not exactly match your total screen ratio. In Letterbox mode, the anchor shifts which part of the background outside the image is visible (rarely noticeable).")
+            HelpSection2(title: "Smart Crop (✦ sparkles button)") {
+                HelpParagraph(text: "Click the \"Smart Crop\" button in the toolbar to let the app automatically find the best anchor point using Apple's Vision framework:")
+                VStack(alignment: .leading, spacing: 4) {
+                    HelpBullet(text: "First pass: face detection — if faces are found, the crop is centered on them.")
+                    HelpBullet(text: "Fallback: attention saliency — identifies the most visually interesting region (works for landscapes, animals, abstract art).")
+                    HelpBullet(text: "The anchor is then set to the mathematically exact value that centers the crop window on the detected subject.")
+                }
             }
 
-            HelpNote(text: "Experiment freely — the preview updates live as you change the anchor.")
+            HelpSection2(title: "When does the anchor matter?") {
+                HelpParagraph(text: "Only in Fill or Fit mode when the image ratio doesn't exactly match your total screen ratio. In Stretch mode, the anchor has no effect.")
+            }
+
+            HelpNote(text: "Smart Crop works entirely on-device using Apple Vision — no data is sent anywhere.")
         }
     }
 }
@@ -254,7 +269,7 @@ private struct ApplyingContent: View {
 private struct LibraryContent: View {
     var body: some View {
         HelpPage(title: "Library", icon: "photo.stack", iconColor: .indigo) {
-            HelpParagraph(text: "The Library stores complete wallpaper sets so you can recall, rotate, or re-edit them at any time.")
+            HelpParagraph(text: "The Library tab stores complete wallpaper sets so you can recall, rotate, or re-edit them at any time. Access it via the Library tab in the navigation bar.")
 
             HelpSection2(title: "Saving to the library") {
                 HelpBullet(text: "\"Save Split to Library\": saves the current split (one image per screen) plus the original source image.")
@@ -263,19 +278,20 @@ private struct LibraryContent: View {
             }
 
             HelpSection2(title: "Import Folder") {
-                HelpParagraph(text: "Point ImageSplitter at a folder of images and it will split each one with the current settings and save them all as individual library sets. Useful for building a rotation library in bulk.")
+                HelpParagraph(text: "Point ImageSplitter at a folder of images and it will split each one with the current settings and save them all as individual library sets — useful for building a rotation collection in bulk.")
             }
 
-            HelpSection2(title: "Random & Auto-Rotate") {
+            HelpSection2(title: "Random & Auto-Rotate (Pro)") {
                 HelpBullet(text: "\"Random Wallpaper\": instantly applies a random set from the library.")
-                HelpBullet(text: "The toggle + interval picker enables automatic rotation (every 15 min, 30 min, 1 h, 3 h, or daily).")
+                HelpBullet(text: "Auto-Rotate toggle: automatically changes your wallpaper at a set interval — 5 min, 15 min, 30 min, 1 h, 3 h, Daily, or a Custom duration you enter in minutes.")
+                HelpBullet(text: "Auto-Rotate requires Pro.")
             }
 
-            HelpSection2(title: "Load for editing (✏️)") {
-                HelpParagraph(text: "Hover over a library set — if the original image was saved with it, a pencil button appears. Click it to reload the original image into the editor. You can then adjust the fit mode, anchor point, or screen layout and apply or save a new version.")
+            HelpSection2(title: "Load for editing (pencil icon)") {
+                HelpParagraph(text: "Hover over a library set — if the original image was saved with it, a pencil button appears. Click it to reload the original into the editor to adjust fit mode, anchor, Smart Crop, and re-apply.")
             }
 
-            HelpNote(text: "Library sets are stored in ~/Library/Application Support/ImageSplitter/Library/. Each set has its own folder with the tile images, a thumbnail, and the original source image (when available).")
+            HelpNote(text: "Library sets are stored in ~/Library/Application Support/ImageSplitter/Library/. Each set has its own folder with tile images, a thumbnail, and the original source image (when available).")
         }
     }
 }
@@ -283,17 +299,21 @@ private struct LibraryContent: View {
 private struct PresetsContent: View {
     var body: some View {
         HelpPage(title: "Presets", icon: "bookmark", iconColor: .orange) {
-            HelpParagraph(text: "Presets save your screen configuration — screen layout, fit mode, and output format — not the image itself. Use them when you frequently switch between different monitor arrangements.")
+            HelpParagraph(text: "Presets save your screen configuration — screen layout and fit mode — not the image itself. Use them when you frequently switch between different monitor arrangements.")
 
             HelpSection2(title: "Saving a preset (⌘S)") {
                 HelpParagraph(text: "After configuring your screens and choosing a fit mode, press ⌘S or click \"Save Preset…\". Give it a name (e.g. \"Home 3 screens\" or \"Laptop only\"). If a source image is loaded, a bookmark to it is saved as well.")
             }
 
             HelpSection2(title: "Loading a preset") {
-                HelpParagraph(text: "Double-click a preset in the sidebar or hover and click the load button. The screen layout, fit mode, and output format are restored. If the original image is still accessible, it is reloaded too.")
+                HelpParagraph(text: "Double-click a preset in the Browse tab (My Presets) or hover and click the load button. The screen layout, fit mode, and source image are all restored.")
             }
 
-            HelpNote(text: "Presets store screen positions, sizes, and names but not the split images. The Library is the right place to save complete wallpaper sets.")
+            HelpSection2(title: "Free vs Pro limit") {
+                HelpParagraph(text: "The free version allows up to 3 saved presets. Upgrade to Pro for unlimited presets.")
+            }
+
+            HelpNote(text: "Presets store screen positions, sizes, and names but not the split images. Use the Library tab to save and recall complete wallpaper sets.")
         }
     }
 }
@@ -301,32 +321,75 @@ private struct PresetsContent: View {
 private struct BrowseContent: View {
     var body: some View {
         HelpPage(title: "Browse Photos", icon: "photo.on.rectangle.angled", iconColor: .teal) {
-            HelpParagraph(text: "The Browse tab lets you search and download free wallpapers from Unsplash and Pexels without leaving the app.")
+            HelpParagraph(text: "The Browse tab gives access to 6 photo sources. Most require Pro. All API keys are stored locally on your Mac.")
 
-            HelpSection2(title: "Setting up API keys") {
-                HelpParagraph(text: "Both services require a free API key. Go to Settings (⌘,) → APIs and paste your keys:")
+            HelpSection2(title: "Available sources") {
                 VStack(alignment: .leading, spacing: 4) {
-                    HelpBullet(text: "Unsplash: create a developer app at unsplash.com/developers. Use the Access Key.")
-                    HelpBullet(text: "Pexels: request a free key at pexels.com/api. Approval is instant.")
+                    HelpBullet(text: "Unsplash — 4M+ free photos. Free API key required (unsplash.com/developers).")
+                    HelpBullet(text: "Pexels — 3M+ free stock photos. Free API key required (pexels.com/api).")
+                    HelpBullet(text: "Wallhaven — 1M+ HD wallpapers. Works without a key; optional key unlocks NSFW content.")
+                    HelpBullet(text: "Pixabay — 1.9M+ photos & vectors. Free API key required (pixabay.com/api/docs).")
+                    HelpBullet(text: "NASA APOD — Astronomy Picture of the Day. Works without a key (DEMO_KEY rate limit); optional NASA key for higher limits.")
+                    HelpBullet(text: "Pinterest — Browse your personal boards & pins. Requires a personal access token from developers.pinterest.com.")
                 }
             }
 
-            HelpSection2(title: "Searching") {
+            HelpSection2(title: "Searching & browsing") {
                 HelpBullet(text: "Type any keyword and press ↵ or click Search.")
                 HelpBullet(text: "Use the quick-tag buttons (Nature, Space, City…) for instant searches.")
                 HelpBullet(text: "Click the shuffle button for random photos on the current topic.")
-                HelpBullet(text: "Scroll to the bottom to load more results (infinite scroll).")
+                HelpBullet(text: "Scroll to the bottom to load more results automatically.")
+                HelpBullet(text: "NASA APOD: click \"Load More\" to add 30 more random astronomy images (existing ones are preserved).")
             }
 
             HelpSection2(title: "Ratio filter") {
-                HelpParagraph(text: "Enable \"Match ratio\" to show only photos whose aspect ratio matches your total screen layout. A green badge marks matching photos. This is especially useful for ultra-wide or triple-monitor setups.")
+                HelpParagraph(text: "Enable \"Match ratio\" to show only photos whose aspect ratio matches your total screen layout. A green badge marks matching photos — especially useful for ultra-wide or triple-monitor setups.")
             }
 
-            HelpSection2(title: "Using a photo") {
-                HelpParagraph(text: "Hover over any photo and click \"Use as Wallpaper\". The full-resolution image is downloaded and automatically loaded into the editor. You can then adjust settings and apply it.")
+            HelpSection2(title: "Preview before applying") {
+                HelpParagraph(text: "Hover over any photo and click \"Use as Wallpaper\". The full-resolution image is downloaded and the Preview sheet opens — showing exact slice boundaries across all your screens. Click Apply Wallpapers to confirm, or Cancel to go back.")
             }
 
-            HelpNote(text: "Unsplash images are free to use under the Unsplash License. Pexels images are free to use under the Pexels License. Always credit the photographer when required.")
+            HelpNote(text: "All photo sources (except My Presets and My Medias) require Pro. Set up your API keys in Settings (⌘,) → APIs.")
+        }
+    }
+}
+
+private struct ProContent: View {
+    var body: some View {
+        HelpPage(title: "Pro Version", icon: "sparkles", iconColor: .accentColor) {
+            HelpParagraph(text: "ImageSplitter is free to use with a core set of features. A one-time Pro upgrade unlocks everything permanently — no subscription.")
+
+            HelpSection2(title: "Free tier includes") {
+                VStack(alignment: .leading, spacing: 4) {
+                    HelpBullet(text: "Unlimited splits across any number of screens.")
+                    HelpBullet(text: "Drag & drop, paste, and file browser image loading.")
+                    HelpBullet(text: "All fit modes (Fill, Letterbox, Stretch) and the 3×3 anchor grid.")
+                    HelpBullet(text: "Smart Crop (on-device Vision analysis).")
+                    HelpBullet(text: "Preview before apply.")
+                    HelpBullet(text: "Library — save, backup, and recall wallpaper sets.")
+                    HelpBullet(text: "Up to 3 saved presets.")
+                    HelpBullet(text: "My Medias file browser.")
+                }
+            }
+
+            HelpSection2(title: "Pro unlocks") {
+                VStack(alignment: .leading, spacing: 4) {
+                    HelpBullet(text: "All photo APIs: Unsplash, Pexels, Wallhaven, Pixabay, NASA APOD, Pinterest.")
+                    HelpBullet(text: "Unlimited presets (free: 3 max).")
+                    HelpBullet(text: "Auto-Rotate: automatically change wallpapers every X minutes.")
+                }
+            }
+
+            HelpSection2(title: "How to upgrade") {
+                HelpParagraph(text: "Open Settings (⌘,) → Pro tab, or click any locked Pro feature. The purchase is handled securely by Apple. You pay once and the upgrade is yours forever — on all your Macs with the same Apple ID.")
+            }
+
+            HelpSection2(title: "Restoring a purchase") {
+                HelpParagraph(text: "If you reinstall or switch Mac, go to Settings → Pro and click \"Restore Purchase\". Your purchase is tied to your Apple ID and restored instantly.")
+            }
+
+            HelpNote(text: "Pro status is verified locally via StoreKit — no account or internet connection required after purchase.")
         }
     }
 }

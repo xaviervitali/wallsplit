@@ -8,6 +8,7 @@ struct ContentView: View {
     enum Tab: String, CaseIterable {
         case split = "Split"
         case browse = "Browse"
+        case library = "Library"
     }
     
     var body: some View {
@@ -21,7 +22,7 @@ struct ContentView: View {
                             withAnimation(.easeInOut(duration: 0.15)) { selectedTab = tab }
                         } label: {
                             HStack(spacing: 5) {
-                                Image(systemName: tab == .split ? "rectangle.split.3x1" : "photo.on.rectangle.angled")
+                                Image(systemName: tab == .split ? "rectangle.split.3x1" : tab == .browse ? "photo.on.rectangle.angled" : "photo.stack")
                                     .font(.caption)
                                 Text(tab.rawValue).font(.callout.weight(selectedTab == tab ? .semibold : .regular))
                             }
@@ -40,6 +41,7 @@ struct ContentView: View {
                 } else {
                     Spacer()
                 }
+
             }
             
             Divider()
@@ -52,6 +54,14 @@ struct ContentView: View {
                 BrowseView(onImageLoaded: {
                     withAnimation(.easeInOut(duration: 0.15)) { selectedTab = .split }
                 }).environmentObject(viewModel)
+            case .library:
+                HStack {
+                    Spacer(minLength: 0)
+                    LibraryView()
+                        .environmentObject(viewModel)
+                        .frame(maxWidth: 480)
+                    Spacer(minLength: 0)
+                }
             }
         }
         .alert("Export Complete", isPresented: $viewModel.showExportSuccess) {
@@ -63,6 +73,12 @@ struct ContentView: View {
         } message: { Text(viewModel.wallpaperResultMessage) }
         .sheet(isPresented: $viewModel.showSavePreset) { SavePresetSheet().environmentObject(viewModel) }
         .sheet(isPresented: $viewModel.showHelp) { HelpView() }
+        .sheet(isPresented: $viewModel.showPreviewOverlay) {
+            WallpaperPreviewView(onApplied: {
+                withAnimation(.easeInOut(duration: 0.15)) { selectedTab = .split }
+            }).environmentObject(viewModel)
+        }
+        .sheet(isPresented: $viewModel.showUpgradeSheet) { ProUpgradeView() }
         .onDrop(of: [.image, .fileURL], isTargeted: $viewModel.isDragging) { viewModel.handleDrop(providers: $0) }
     }
     

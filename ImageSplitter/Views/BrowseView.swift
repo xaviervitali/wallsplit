@@ -60,30 +60,51 @@ enum PhotoSource: String, CaseIterable {
     case myPresets = "My Presets"
     case unsplash  = "Unsplash"
     case pexels    = "Pexels"
+    case wallhaven = "Wallhaven"
+    case pixabay   = "Pixabay"
+    case nasaApod  = "NASA"
+    case pinterest = "Pinterest"
     case files     = "My Medias"
 
     var icon: String {
         switch self {
-        case .myPresets: return "star.fill"
-        case .unsplash:  return "camera.aperture"
-        case .pexels:    return "photo.artframe"
-        case .files:     return "folder"
+        case .myPresets:  return "star.fill"
+        case .unsplash:   return "camera.aperture"
+        case .pexels:     return "photo.artframe"
+        case .wallhaven:  return "rectangle.stack.fill"
+        case .pixabay:    return "photo.fill"
+        case .nasaApod:   return "sparkles"
+        case .pinterest:  return "pin.fill"
+        case .files:      return "folder"
+        }
+    }
+
+    /// Pro feature gate
+    var requiresPro: Bool {
+        switch self {
+        case .myPresets, .files: return false
+        default: return true
         }
     }
 
     var apiSettingsKey: String {
         switch self {
-        case .unsplash: return "unsplashAccessKey"
-        case .pexels:   return "pexelsApiKey"
-        default:        return ""
+        case .unsplash:  return "unsplashAccessKey"
+        case .pexels:    return "pexelsApiKey"
+        case .pixabay:   return "pixabayApiKey"
+        case .pinterest: return "pinterestAccessToken"
+        default:         return ""
         }
     }
 
     var developerURL: URL {
         switch self {
-        case .unsplash: return URL(string: "https://unsplash.com/developers")!
-        case .pexels:   return URL(string: "https://www.pexels.com/api/")!
-        default:        return URL(string: "https://www.apple.com")!
+        case .unsplash:  return URL(string: "https://unsplash.com/developers")!
+        case .pexels:    return URL(string: "https://www.pexels.com/api/")!
+        case .pixabay:   return URL(string: "https://pixabay.com/api/docs/")!
+        case .nasaApod:  return URL(string: "https://api.nasa.gov/")!
+        case .pinterest: return URL(string: "https://developers.pinterest.com/")!
+        default:         return URL(string: "https://www.apple.com")!
         }
     }
 }
@@ -101,10 +122,12 @@ struct BrowsablePhoto: Identifiable {
     let source: PhotoSource
 
     var photoAspectRatio: CGFloat {
-        guard height > 0 else { return 1 }
+        guard height > 0 else { return 16.0 / 9.0 }
         return CGFloat(width) / CGFloat(height)
     }
 }
+
+// MARK: - Photo model conversions
 
 extension UnsplashPhoto {
     func toBrowsable() -> BrowsablePhoto {
@@ -134,14 +157,61 @@ extension PexelsPhoto {
     }
 }
 
+extension WallhavenPhoto {
+    func toBrowsable() -> BrowsablePhoto {
+        BrowsablePhoto(
+            id: "wh_\(id)",
+            width: dimension_x, height: dimension_y,
+            colorHex: "#808080",
+            description: nil,
+            authorName: "Wallhaven",
+            thumbnailURL: thumbs.large,
+            source: .wallhaven
+        )
+    }
+}
+
+extension PixabayPhoto {
+    func toBrowsable() -> BrowsablePhoto {
+        BrowsablePhoto(
+            id: "px_\(id)",
+            width: imageWidth, height: imageHeight,
+            colorHex: "#808080",
+            description: tags.isEmpty ? nil : tags,
+            authorName: user,
+            thumbnailURL: previewURL,
+            source: .pixabay
+        )
+    }
+}
+
+extension NASAAPODPhoto {
+    func toBrowsable() -> BrowsablePhoto {
+        BrowsablePhoto(
+            id: "nasa_\(date)",
+            width: 3840, height: 2160,   // placeholder — actual size unknown from API
+            colorHex: "#0d1b2a",
+            description: title,
+            authorName: "NASA",
+            thumbnailURL: url,
+            source: .nasaApod
+        )
+    }
+}
+
 // MARK: - BrowseView
 
 struct BrowseView: View {
     @EnvironmentObject var viewModel: SplitterViewModel
+    @ObservedObject private var proManager = ProManager.shared
     var onImageLoaded: (() -> Void)? = nil
 
-    @StateObject private var unsplash = UnsplashService()
-    @StateObject private var pexels   = PexelsService()
+    @StateObject private var unsplash  = UnsplashService()
+    @StateObject private var pexels    = PexelsService()
+    @StateObject private var wallhaven = WallhavenService()
+    @StateObject private var pixabay   = PixabayService()
+    @StateObject private var nasaApod  = NASAAPODService()
+    @StateObject private var pinterest = PinterestService()
 
     @State private var selectedSource: PhotoSource = .myPresets
     @State private var searchText = ""
@@ -181,9 +251,12 @@ struct BrowseView: View {
 
     private var allPhotos: [BrowsablePhoto] {
         switch selectedSource {
-        case .unsplash: return unsplash.photos.map { $0.toBrowsable() }
-        case .pexels:   return pexels.photos.map   { $0.toBrowsable() }
-        default:        return []
+        case .unsplash:  return unsplash.photos.map  { $0.toBrowsable() }
+        case .pexels:    return pexels.photos.map    { $0.toBrowsable() }
+        case .wallhaven: return wallhaven.photos.map { $0.toBrowsable() }
+        case .pixabay:   return pixabay.photos.map   { $0.toBrowsable() }
+        case .nasaApod:  return nasaApod.photos.map  { $0.toBrowsable() }
+        default:         return []
         }
     }
 
@@ -195,23 +268,35 @@ struct BrowseView: View {
         switch selectedSource {
         case .unsplash:  return unsplash.isLoading
         case .pexels:    return pexels.isLoading
+        case .wallhaven: return wallhaven.isLoading
+        case .pixabay:   return pixabay.isLoading
+        case .nasaApod:  return nasaApod.isLoading
+        case .pinterest: return pinterest.isLoading
         default:         return false
         }
     }
 
     private var errorMessage: String? {
         switch selectedSource {
-        case .unsplash: return unsplash.errorMessage
-        case .pexels:   return pexels.errorMessage
-        default:        return nil
+        case .unsplash:  return unsplash.errorMessage
+        case .pexels:    return pexels.errorMessage
+        case .wallhaven: return wallhaven.errorMessage
+        case .pixabay:   return pixabay.errorMessage
+        case .nasaApod:  return nasaApod.errorMessage
+        case .pinterest: return pinterest.errorMessage
+        default:         return nil
         }
     }
 
     private var hasApiKey: Bool {
         switch selectedSource {
-        case .unsplash: return unsplash.hasApiKey
-        case .pexels:   return pexels.hasApiKey
-        default:        return true
+        case .unsplash:  return unsplash.hasApiKey
+        case .pexels:    return pexels.hasApiKey
+        case .wallhaven: return wallhaven.hasApiKey
+        case .pixabay:   return pixabay.hasApiKey
+        case .nasaApod:  return nasaApod.hasApiKey
+        case .pinterest: return pinterest.hasApiKey
+        default:         return true
         }
     }
 
@@ -219,33 +304,43 @@ struct BrowseView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-
             // Source picker
-            HStack(spacing: 0) {
-                ForEach(PhotoSource.allCases, id: \.self) { source in
-                    Button {
-                        selectedSource = source
-                    } label: {
-                        Label(source.rawValue, systemImage: source.icon)
-                            .font(.callout.weight(selectedSource == source ? .semibold : .regular))
-                            .padding(.horizontal, 14).padding(.vertical, 7)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 0) {
+                    ForEach(PhotoSource.allCases, id: \.self) { source in
+                        Button {
+                            if source.requiresPro && !proManager.isPro {
+                                viewModel.showUpgradeSheet = true
+                            } else {
+                                selectedSource = source
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Label(source.rawValue, systemImage: source.icon)
+                                    .font(.callout.weight(selectedSource == source ? .semibold : .regular))
+                                if source.requiresPro && !proManager.isPro {
+                                    ProBadge()
+                                }
+                            }
+                            .padding(.horizontal, 12).padding(.vertical, 7)
                             .background(selectedSource == source
                                 ? Color.accentColor.opacity(0.12)
                                 : Color.clear,
                                 in: RoundedRectangle(cornerRadius: 6))
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundStyle(selectedSource == source ? Color.accentColor : .secondary)
                     }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(selectedSource == source ? Color.accentColor : .secondary)
+                    Spacer()
+                    HStack(spacing: 6) {
+                        Image(systemName: "square.grid.3x3").font(.caption2).foregroundStyle(.tertiary)
+                        Slider(value: $cardSize, in: 140...420, step: 10).frame(width: 110)
+                        Image(systemName: "square.grid.2x2").font(.caption).foregroundStyle(.tertiary)
+                    }
+                    .padding(.trailing, 4)
                 }
-                Spacer()
-                HStack(spacing: 6) {
-                    Image(systemName: "square.grid.3x3").font(.caption2).foregroundStyle(.tertiary)
-                    Slider(value: $cardSize, in: 140...420, step: 10).frame(width: 110)
-                    Image(systemName: "square.grid.2x2").font(.caption).foregroundStyle(.tertiary)
-                }
-                .padding(.trailing, 4)
+                .padding(.horizontal, 12).padding(.vertical, 8)
             }
-            .padding(.horizontal, 12).padding(.vertical, 8)
 
             Divider()
 
@@ -254,87 +349,99 @@ struct BrowseView: View {
                 MyPresetsView(onImageLoaded: onImageLoaded).environmentObject(viewModel)
             case .files:
                 FileBrowserView(onImageLoaded: onImageLoaded).environmentObject(viewModel)
+            case .pinterest:
+                PinterestBoardsView(service: pinterest, onImageLoaded: onImageLoaded)
+                    .environmentObject(viewModel)
             default:
                 onlineContent
             }
         }
     }
 
-    // MARK: Online content (Unsplash / Pexels)
+    // MARK: Online content (Unsplash / Pexels / Wallhaven / Pixabay / NASA)
 
     private var onlineContent: some View {
         VStack(spacing: 0) {
             // API key warning
-            if !hasApiKey {
-                apiKeyWarning
-            }
+            if !hasApiKey { apiKeyWarning }
 
-            // Search bar
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                TextField("Search wallpapers… (nature, city, abstract…)", text: $searchText)
-                    .textFieldStyle(.plain)
-                    .onSubmit { performSearch() }
+            // Search bar (hidden for NASA since it has no search)
+            if selectedSource != .nasaApod {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                    TextField("Search wallpapers… (nature, city, abstract…)", text: $searchText)
+                        .textFieldStyle(.plain)
+                        .onSubmit { performSearch() }
 
-                if isLoading {
-                    ProgressView().controlSize(.small)
-                }
+                    if isLoading { ProgressView().controlSize(.small) }
 
-                Button("Search") { performSearch() }
-                    .buttonStyle(.borderedProminent).controlSize(.small)
-                    .disabled(searchText.isEmpty || !hasApiKey)
+                    Button("Search") { performSearch() }
+                        .buttonStyle(.borderedProminent).controlSize(.small)
+                        .disabled(searchText.isEmpty || !hasApiKey)
 
-                Button {
-                    switch selectedSource {
-                    case .unsplash: unsplash.fetchRandom(topic: searchText.isEmpty ? nil : searchText)
-                    case .pexels:   pexels.fetchRandom(topic: searchText.isEmpty ? nil : searchText)
-                    default:        break
+                    Button {
+                        performRandom()
+                    } label: {
+                        Image(systemName: "shuffle")
                     }
-                } label: {
-                    Image(systemName: "shuffle")
+                    .buttonStyle(.bordered).controlSize(.small)
+                    .disabled(!hasApiKey)
+                    .help("Random wallpapers")
                 }
-                .buttonStyle(.bordered).controlSize(.small)
-                .disabled(!hasApiKey)
-                .help("Random wallpapers")
-            }
-            .padding(.horizontal, 16).padding(.vertical, 10)
+                .padding(.horizontal, 16).padding(.vertical, 10)
 
-            // Screen info + ratio filter + quick tags
-            HStack(spacing: 12) {
-                HStack(spacing: 4) {
-                    Image(systemName: "display.2").font(.caption2)
-                    Text(ratioString).font(.caption.weight(.medium))
-                    Text("·").font(.caption)
-                    Text("min \(minResolution)").font(.caption2.monospaced())
-                }
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(RoundedRectangle(cornerRadius: 6).fill(.quaternary.opacity(0.5)))
+                // Screen info + ratio filter + quick tags
+                HStack(spacing: 12) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "display.2").font(.caption2)
+                        Text(ratioString).font(.caption.weight(.medium))
+                        Text("·").font(.caption)
+                        Text("min \(minResolution)").font(.caption2.monospaced())
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(.quaternary.opacity(0.5)))
 
-                Toggle(isOn: $filterByRatio) {
-                    Label("Match ratio", systemImage: "aspectratio").font(.caption)
-                }
-                .toggleStyle(.button).controlSize(.mini)
-                .help("Only show images that match your screen ratio")
+                    Toggle(isOn: $filterByRatio) {
+                        Label("Match ratio", systemImage: "aspectratio").font(.caption)
+                    }
+                    .toggleStyle(.button).controlSize(.mini)
 
-                Divider().frame(height: 14)
+                    Divider().frame(height: 14)
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(["Nature", "Space", "Ocean", "Mountains", "City",
-                                 "Abstract", "Minimal", "Dark", "Forest", "Sunset"], id: \.self) { tag in
-                            Button(tag) {
-                                searchText = tag.lowercased()
-                                performSearch()
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            ForEach(["Nature", "Space", "Ocean", "Mountains", "City",
+                                     "Abstract", "Minimal", "Dark", "Forest", "Sunset"], id: \.self) { tag in
+                                Button(tag) {
+                                    searchText = tag.lowercased()
+                                    performSearch()
+                                }
+                                .buttonStyle(.bordered).controlSize(.mini)
                             }
-                            .buttonStyle(.bordered).controlSize(.mini)
                         }
                     }
                 }
-            }
-            .padding(.horizontal, 16).padding(.bottom, 8)
+                .padding(.horizontal, 16).padding(.bottom, 8)
 
-            Divider()
+                Divider()
+            } else {
+                // NASA: just a "Refresh" button
+                HStack {
+                    Text("Astronomy Picture of the Day — random selection")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    if isLoading { ProgressView().controlSize(.small) }
+                    Button {
+                        nasaApod.fetchRandom()
+                    } label: {
+                        Label("Load More", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(.bordered).controlSize(.small)
+                }
+                .padding(.horizontal, 16).padding(.vertical, 10)
+                Divider()
+            }
 
             // Error banner
             if let error = errorMessage {
@@ -372,6 +479,12 @@ struct BrowseView: View {
                 }
             }
         }
+        .onAppear {
+            // Auto-load NASA APOD when switched to
+            if selectedSource == .nasaApod && nasaApod.photos.isEmpty {
+                nasaApod.fetchRandom()
+            }
+        }
     }
 
     // MARK: Sub-views
@@ -401,10 +514,15 @@ struct BrowseView: View {
             if allPhotos.isEmpty {
                 Image(systemName: "photo.on.rectangle.angled")
                     .font(.system(size: 40, weight: .ultraLight)).foregroundStyle(.tertiary)
-                Text("Search for wallpapers on \(selectedSource.rawValue)")
-                    .font(.callout).foregroundStyle(.secondary)
-                Text("Millions of free high-resolution photos")
-                    .font(.caption).foregroundStyle(.tertiary)
+                if selectedSource == .nasaApod {
+                    Text("Click Refresh to load NASA photos")
+                        .font(.callout).foregroundStyle(.secondary)
+                } else {
+                    Text("Search for wallpapers on \(selectedSource.rawValue)")
+                        .font(.callout).foregroundStyle(.secondary)
+                    Text("Millions of free high-resolution photos")
+                        .font(.caption).foregroundStyle(.tertiary)
+                }
             } else {
                 Image(systemName: "aspectratio").font(.title2).foregroundStyle(.tertiary)
                 Text("No images match your screen ratio (\(ratioString))")
@@ -420,18 +538,35 @@ struct BrowseView: View {
 
     private func performSearch() {
         switch selectedSource {
-        case .unsplash: unsplash.search(query: searchText)
-        case .pexels:   pexels.search(query: searchText)
-        default:        break
+        case .unsplash:  unsplash.search(query: searchText)
+        case .pexels:    pexels.search(query: searchText)
+        case .wallhaven: wallhaven.search(query: searchText)
+        case .pixabay:   pixabay.search(query: searchText)
+        case .nasaApod:  nasaApod.fetchRandom()
+        default: break
+        }
+    }
+
+    private func performRandom() {
+        let q = searchText.isEmpty ? nil : searchText
+        switch selectedSource {
+        case .unsplash:  unsplash.fetchRandom(topic: q)
+        case .pexels:    pexels.fetchRandom(topic: q)
+        case .wallhaven: wallhaven.fetchRandom(topic: q)
+        case .pixabay:   pixabay.fetchRandom(topic: q)
+        case .nasaApod:  nasaApod.fetchRandom()
+        default: break
         }
     }
 
     private func triggerLoadMoreIfNeeded(photo: BrowsablePhoto) {
         guard photo.id == displayedPhotos.last?.id else { return }
         switch selectedSource {
-        case .unsplash: unsplash.loadMore()
-        case .pexels:   pexels.loadMore()
-        default:        break
+        case .unsplash:  unsplash.loadMore()
+        case .pexels:    pexels.loadMore()
+        case .wallhaven: wallhaven.loadMore()
+        case .pixabay:   pixabay.loadMore()
+        default: break
         }
     }
 
@@ -439,37 +574,268 @@ struct BrowseView: View {
         downloadingId = photo.id
         let bb = viewModel.screenManager.boundingBox
 
+        func finish(_ image: NSImage?, _ name: String) {
+            downloadingId = nil
+            guard let image else { return }
+            viewModel.loadImage(image, name: name)
+            viewModel.showPreviewOverlay = true
+        }
+
         switch photo.source {
         case .unsplash:
-            guard let original = unsplash.photos.first(where: { "u_\($0.id)" == photo.id }) else {
+            guard let orig = unsplash.photos.first(where: { "u_\($0.id)" == photo.id }) else {
                 downloadingId = nil; return
             }
-            let targetWidth = max(Int(bb.width), original.width)
-            unsplash.downloadImage(photo: original, targetWidth: targetWidth) { image in
-                downloadingId = nil
-                guard let image else { return }
-                let name = photo.description?.prefix(40).replacingOccurrences(of: " ", with: "_") ?? "unsplash_\(original.id)"
-                viewModel.loadImage(image, name: String(name))
-                viewModel.applyCurrentTiles()
-                onImageLoaded?()
+            let targetWidth = max(Int(bb.width), orig.width)
+            unsplash.downloadImage(photo: orig, targetWidth: targetWidth) { img in
+                let name = photo.description?.prefix(40).replacingOccurrences(of: " ", with: "_") ?? "unsplash_\(orig.id)"
+                finish(img, String(name))
             }
 
         case .pexels:
-            guard let original = pexels.photos.first(where: { "p_\($0.id)" == photo.id }) else {
+            guard let orig = pexels.photos.first(where: { "p_\($0.id)" == photo.id }) else {
                 downloadingId = nil; return
             }
-            pexels.downloadImage(photo: original) { image in
-                downloadingId = nil
-                guard let image else { return }
-                let name = photo.description?.prefix(40).replacingOccurrences(of: " ", with: "_") ?? "pexels_\(original.id)"
-                viewModel.loadImage(image, name: String(name))
-                viewModel.applyCurrentTiles()
-                onImageLoaded?()
+            pexels.downloadImage(photo: orig) { img in
+                let name = photo.description?.prefix(40).replacingOccurrences(of: " ", with: "_") ?? "pexels_\(orig.id)"
+                finish(img, String(name))
+            }
+
+        case .wallhaven:
+            guard let orig = wallhaven.photos.first(where: { "wh_\($0.id)" == photo.id }) else {
+                downloadingId = nil; return
+            }
+            wallhaven.downloadImage(photo: orig) { img in
+                finish(img, "wallhaven_\(orig.id)")
+            }
+
+        case .pixabay:
+            guard let orig = pixabay.photos.first(where: { "px_\($0.id)" == photo.id }) else {
+                downloadingId = nil; return
+            }
+            pixabay.downloadImage(photo: orig) { img in
+                let name = photo.description?.prefix(40).replacingOccurrences(of: " ", with: "_") ?? "pixabay_\(orig.id)"
+                finish(img, String(name))
+            }
+
+        case .nasaApod:
+            guard let orig = nasaApod.photos.first(where: { "nasa_\($0.date)" == photo.id }) else {
+                downloadingId = nil; return
+            }
+            nasaApod.downloadImage(photo: orig) { img in
+                finish(img, photo.description ?? "nasa_\(orig.date)")
             }
 
         default:
-            break
+            downloadingId = nil
         }
+    }
+}
+
+// MARK: - Pinterest Boards View
+
+struct PinterestBoardsView: View {
+    @ObservedObject var service: PinterestService
+    @EnvironmentObject var viewModel: SplitterViewModel
+    var onImageLoaded: (() -> Void)?
+
+    @State private var downloadingId: String?
+    @AppStorage("browseCardSize") private var cardSize: Double = 220
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // API key warning
+            if !service.hasApiKey {
+                HStack(spacing: 8) {
+                    Image(systemName: "key.fill").foregroundStyle(.orange)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Pinterest Access Token Required")
+                            .font(.callout.weight(.medium))
+                        Text("Get a personal access token at developers.pinterest.com, then paste in Settings (⌘,)")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Get Token") {
+                        NSWorkspace.shared.open(URL(string: "https://developers.pinterest.com/")!)
+                    }
+                    .buttonStyle(.bordered).controlSize(.small)
+                }
+                .padding(12)
+                .background(Color.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                .padding(.horizontal, 16).padding(.top, 8)
+            }
+
+            // Board picker
+            if !service.boards.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(service.boards) { board in
+                            Button {
+                                service.selectBoard(board.id)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(board.name).font(.callout)
+                                    if let count = board.pin_count {
+                                        Text("(\(count))").font(.caption2).foregroundStyle(.tertiary)
+                                    }
+                                }
+                                .padding(.horizontal, 10).padding(.vertical, 5)
+                                .background(
+                                    service.selectedBoardId == board.id
+                                        ? Color.accentColor.opacity(0.12) : Color.clear,
+                                    in: RoundedRectangle(cornerRadius: 6))
+                            }
+                            .buttonStyle(.borderless)
+                            .foregroundStyle(service.selectedBoardId == board.id ? Color.accentColor : .primary)
+                        }
+                    }
+                    .padding(.horizontal, 14).padding(.vertical, 8)
+                }
+                Divider()
+            }
+
+            // Error
+            if let error = service.errorMessage {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle").foregroundStyle(.orange)
+                    Text(error).font(.callout).foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(.horizontal, 16).padding(.vertical, 8)
+                .background(Color.orange.opacity(0.08))
+            }
+
+            // Loading / empty state
+            if service.isLoading && service.pins.isEmpty {
+                ProgressView("Loading boards…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if service.pins.isEmpty && !service.isLoading {
+                VStack(spacing: 12) {
+                    Image(systemName: "pin.slash")
+                        .font(.system(size: 40, weight: .ultraLight)).foregroundStyle(.tertiary)
+                    if service.hasApiKey {
+                        Text("No pins in this board")
+                            .font(.callout).foregroundStyle(.secondary)
+                        Button("Load Boards") { service.fetchBoards() }
+                            .buttonStyle(.bordered).controlSize(.small)
+                    } else {
+                        Text("Add your Pinterest Access Token in Settings")
+                            .font(.callout).foregroundStyle(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    MasonryLayout(minimumColumnWidth: CGFloat(cardSize), spacing: 12) {
+                        ForEach(service.pins) { pin in
+                            PinterestPinCard(
+                                pin: pin,
+                                isDownloading: downloadingId == pin.id
+                            ) {
+                                downloadPin(pin)
+                            }
+                            .onAppear {
+                                if pin.id == service.pins.last?.id { service.loadMore() }
+                            }
+                        }
+                    }
+                    .padding(16)
+
+                    if service.isLoading && !service.pins.isEmpty {
+                        ProgressView("Loading more…").padding()
+                    }
+                }
+            }
+        }
+        .onAppear {
+            if service.hasApiKey && service.boards.isEmpty { service.fetchBoards() }
+        }
+    }
+
+    private func downloadPin(_ pin: PinterestPin) {
+        downloadingId = pin.id
+        service.downloadImage(pin: pin) { image in
+            self.downloadingId = nil
+            guard let image else { return }
+            let name = pin.title ?? pin.description ?? "pinterest_\(pin.id)"
+            self.viewModel.loadImage(image, name: String(name.prefix(40)))
+            self.viewModel.showPreviewOverlay = true
+        }
+    }
+}
+
+// MARK: - Pinterest Pin Card
+
+struct PinterestPinCard: View {
+    let pin: PinterestPin
+    let isDownloading: Bool
+    let onSelect: () -> Void
+
+    @State private var thumbnail: NSImage?
+    @State private var isHovering = false
+
+    private var aspectRatio: CGFloat {
+        let w = CGFloat(pin.media?.bestWidth ?? 1200)
+        let h = CGFloat(pin.media?.bestHeight ?? 900)
+        guard h > 0 else { return 4.0 / 3.0 }
+        return w / h
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .topTrailing) {
+                ZStack {
+                    if let thumb = thumbnail {
+                        Image(nsImage: thumb).resizable().aspectRatio(contentMode: .fill).clipped()
+                    } else {
+                        Rectangle().fill(Color.secondary.opacity(0.15))
+                            .overlay(ProgressView().controlSize(.small))
+                    }
+                    if isHovering {
+                        Color.black.opacity(0.3)
+                        if isDownloading {
+                            ProgressView().controlSize(.regular).tint(.white)
+                        } else {
+                            Button { onSelect() } label: {
+                                Label("Use as Wallpaper", systemImage: "desktopcomputer")
+                                    .font(.callout.weight(.medium)).foregroundStyle(.white)
+                                    .padding(.horizontal, 14).padding(.vertical, 8)
+                                    .background(.white.opacity(0.2), in: Capsule())
+                            }.buttonStyle(.borderless)
+                        }
+                    }
+                }
+                .aspectRatio(aspectRatio, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                Image(systemName: "pin.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(.white.opacity(0.8))
+                    .padding(5)
+                    .background(Color.red.opacity(0.7), in: Circle())
+                    .padding([.top, .leading], 6)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
+
+            if let title = pin.title ?? pin.description {
+                Text(title)
+                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    .padding(.horizontal, 4).padding(.top, 4)
+            }
+        }
+        .onHover { isHovering = $0 }
+        .onAppear { loadThumbnail() }
+    }
+
+    private func loadThumbnail() {
+        guard thumbnail == nil,
+              let urlStr = pin.media?.thumbnailURL,
+              let url = URL(string: urlStr) else { return }
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            if let data, let img = NSImage(data: data) {
+                DispatchQueue.main.async { thumbnail = img }
+            }
+        }.resume()
     }
 }
 
@@ -539,11 +905,13 @@ struct BrowsePhotoCard: View {
 
             // Info row
             HStack(spacing: 4) {
-                Text("\(photo.width)×\(photo.height)")
-                    .font(.caption2.monospaced()).foregroundStyle(.tertiary)
-                Text(String(format: "(%.1f:1)", photo.photoAspectRatio))
-                    .font(.system(size: 9).monospaced())
-                    .foregroundStyle(matchesRatio ? .green : .gray)
+                if photo.width > 0 {
+                    Text("\(photo.width)×\(photo.height)")
+                        .font(.caption2.monospaced()).foregroundStyle(.tertiary)
+                    Text(String(format: "(%.1f:1)", photo.photoAspectRatio))
+                        .font(.system(size: 9).monospaced())
+                        .foregroundStyle(matchesRatio ? .green : .gray)
+                }
                 Spacer()
                 Text("by \(photo.authorName)")
                     .font(.caption2).foregroundStyle(.secondary).lineLimit(1)
@@ -634,7 +1002,6 @@ private struct PresetCard: View {
             }
             .aspectRatio(cardAspectRatio, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            // Double-clic sur la miniature uniquement pour éviter le conflit avec le bouton supprimer
             .onTapGesture(count: 2) { onSelect() }
 
             // Info row
@@ -744,8 +1111,7 @@ struct FileBrowserView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-
-            // ── Sidebar ──────────────────────────────────────
+            // Sidebar
             VStack(alignment: .leading, spacing: 2) {
                 Text("Emplacements")
                     .font(.caption.weight(.semibold))
@@ -817,10 +1183,8 @@ struct FileBrowserView: View {
 
             Divider()
 
-            // ── Main pane ────────────────────────────────────
+            // Main pane
             VStack(spacing: 0) {
-
-                // Nav bar
                 HStack(spacing: 8) {
                     Button {
                         if let parent = navigationStack.popLast() {
@@ -840,9 +1204,7 @@ struct FileBrowserView: View {
 
                     Spacer()
 
-                    Button {
-                        openFilePicker()
-                    } label: {
+                    Button { openFilePicker() } label: {
                         Label("Choisir un fichier…", systemImage: "folder.badge.plus")
                     }
                     .buttonStyle(.bordered)
@@ -891,8 +1253,6 @@ struct FileBrowserView: View {
             loadItems()
         }
     }
-
-    // MARK: Helpers
 
     private func loadCustomBookmarks() {
         let paths = UserDefaults.standard.stringArray(forKey: "customFolderBookmarks") ?? []
@@ -1013,7 +1373,6 @@ struct FileItemCell: View {
                 }
             }
 
-            // Hover overlay
             if isHovering || isLoading {
                 Color.black.opacity(0.35)
                 if isLoading {

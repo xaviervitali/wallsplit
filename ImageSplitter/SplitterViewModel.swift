@@ -24,6 +24,9 @@ class SplitterViewModel: ObservableObject {
     @Published var showSavePreset = false
     @Published var presetName = ""
     @Published var showHelp = false
+    @Published var showPreviewOverlay = false
+    @Published var showUpgradeSheet = false
+    @Published var isSmartCropping = false
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -136,6 +139,12 @@ class SplitterViewModel: ObservableObject {
 
     func saveCurrentAsPreset() {
         guard !presetName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        // Free tier: max 3 presets
+        if !ProManager.shared.isPro && presetManager.presets.count >= 3 {
+            showSavePreset = false
+            showUpgradeSheet = true
+            return
+        }
         presetManager.savePreset(
             name: presetName,
             screens: screenManager.screens,
@@ -215,6 +224,24 @@ class SplitterViewModel: ObservableObject {
     func loadFromLibrarySet(_ set: WallpaperSet) {
         guard let url = library.originalImageURL(for: set) else { return }
         loadImage(from: url)
+    }
+
+    // MARK: - Smart Crop
+
+    @MainActor
+    func smartCrop() {
+        guard let img = sourceImage, fitMode != .stretch else { return }
+        let canvas = screenManager.boundingBox.size
+        let mode = fitMode
+        isSmartCropping = true
+        Task {
+            if let result = await SmartCropService.suggestAnchor(for: img, canvasSize: canvas, fitMode: mode) {
+                anchorX = result.anchorX
+                anchorY = result.anchorY
+                regenerateAndApply()
+            }
+            isSmartCropping = false
+        }
     }
 
     func clearImage() {

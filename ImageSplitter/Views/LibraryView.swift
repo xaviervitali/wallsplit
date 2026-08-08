@@ -2,12 +2,15 @@ import SwiftUI
 
 struct LibraryView: View {
     @EnvironmentObject var viewModel: SplitterViewModel
+    @ObservedObject private var proManager = ProManager.shared
     @State private var showSaveName = false
     @State private var saveName = ""
     @State private var saveResult: String?
     @State private var isImporting = false
     @State private var importProgress = ""
     @State private var showClearConfirm = false
+    @State private var customMinutes: String = ""
+    @State private var showCustomInterval = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -96,31 +99,67 @@ struct LibraryView: View {
                 .buttonStyle(.borderedProminent).controlSize(.small)
                 .disabled(viewModel.library.sets.isEmpty)
                 
-                // Auto-rotate
-                HStack(spacing: 8) {
-                    Toggle(isOn: Binding(
-                        get: { viewModel.library.autoRotateEnabled },
-                        set: { enabled in
-                            if enabled { viewModel.library.startAutoRotation() }
-                            else { viewModel.library.stopAutoRotation() }
+                // Auto-rotate (Pro feature)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Toggle(isOn: Binding(
+                            get: { viewModel.library.autoRotateEnabled },
+                            set: { enabled in
+                                guard proManager.isPro else {
+                                    viewModel.showUpgradeSheet = true
+                                    return
+                                }
+                                if enabled { viewModel.library.startAutoRotation() }
+                                else { viewModel.library.stopAutoRotation() }
+                            }
+                        )) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.triangle.2.circlepath").font(.caption)
+                                Text("Auto-rotate").font(.callout)
+                                if !proManager.isPro { ProBadge() }
+                            }
                         }
-                    )) {
-                        Image(systemName: "arrow.triangle.2.circlepath").font(.caption)
+                        .toggleStyle(.switch).controlSize(.small)
+                        Spacer()
                     }
-                    .toggleStyle(.switch).controlSize(.small)
-                    
-                    Picker("", selection: Binding(
-                        get: { viewModel.library.autoRotateInterval },
-                        set: { viewModel.library.updateRotationInterval($0) }
-                    )) {
-                        Text("15 min").tag(TimeInterval(900))
-                        Text("30 min").tag(TimeInterval(1800))
-                        Text("1 hour").tag(TimeInterval(3600))
-                        Text("3 hours").tag(TimeInterval(10800))
-                        Text("Daily").tag(TimeInterval(86400))
+
+                    if viewModel.library.autoRotateEnabled && proManager.isPro {
+                        HStack(spacing: 6) {
+                            Picker("", selection: Binding(
+                                get: { showCustomInterval ? TimeInterval(-1) : viewModel.library.autoRotateInterval },
+                                set: { val in
+                                    if val == -1 {
+                                        showCustomInterval = true
+                                    } else {
+                                        showCustomInterval = false
+                                        viewModel.library.updateRotationInterval(val)
+                                    }
+                                }
+                            )) {
+                                Text("5 min").tag(TimeInterval(300))
+                                Text("15 min").tag(TimeInterval(900))
+                                Text("30 min").tag(TimeInterval(1800))
+                                Text("1 hour").tag(TimeInterval(3600))
+                                Text("3 hours").tag(TimeInterval(10800))
+                                Text("Daily").tag(TimeInterval(86400))
+                                Text("Custom…").tag(TimeInterval(-1))
+                            }
+                            .pickerStyle(.menu).controlSize(.small)
+                            .frame(maxWidth: .infinity)
+
+                            if showCustomInterval {
+                                HStack(spacing: 4) {
+                                    TextField("min", text: $customMinutes)
+                                        .textFieldStyle(.roundedBorder)
+                                        .frame(width: 46)
+                                        .onSubmit { applyCustomInterval() }
+                                    Text("min").font(.caption).foregroundStyle(.secondary)
+                                    Button("OK") { applyCustomInterval() }
+                                        .buttonStyle(.bordered).controlSize(.mini)
+                                }
+                            }
+                        }
                     }
-                    .pickerStyle(.menu).controlSize(.small)
-                    .frame(maxWidth: .infinity)
                 }
                 .disabled(viewModel.library.sets.isEmpty)
             }
@@ -181,6 +220,13 @@ struct LibraryView: View {
         }
     }
     
+    private func applyCustomInterval() {
+        guard let minutes = Double(customMinutes), minutes > 0 else { return }
+        viewModel.library.updateRotationInterval(minutes * 60)
+        showCustomInterval = false
+        customMinutes = ""
+    }
+
     private func importFolder() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false

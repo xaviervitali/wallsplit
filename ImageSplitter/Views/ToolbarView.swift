@@ -27,6 +27,22 @@ struct ToolbarView: View {
                 AnchorPicker(anchorX: $viewModel.anchorX, anchorY: $viewModel.anchorY)
                     .onChange(of: viewModel.anchorX) { viewModel.regenerateAndApply() }
                     .onChange(of: viewModel.anchorY) { viewModel.regenerateAndApply() }
+
+                Button {
+                    viewModel.smartCrop()
+                } label: {
+                    if viewModel.isSmartCropping {
+                        HStack(spacing: 4) {
+                            ProgressView().controlSize(.small)
+                            Text("Analyzing…").font(.callout)
+                        }
+                    } else {
+                        Label("Smart Crop", systemImage: "sparkles.rectangle.stack").font(.callout)
+                    }
+                }
+                .buttonStyle(.bordered).controlSize(.small)
+                .disabled(viewModel.isSmartCropping)
+                .help("Auto-detect faces / subjects and set the best crop position")
             }
             
             Spacer()
@@ -35,16 +51,20 @@ struct ToolbarView: View {
                 Button { viewModel.openSavePresetSheet() } label: {
                     Label("Save Preset", systemImage: "star").font(.callout)
                 }.buttonStyle(.bordered).controlSize(.small)
-                
+
                 Button { viewModel.clearImage() } label: {
                     Label("Clear", systemImage: "xmark.circle").font(.callout)
                 }.buttonStyle(.bordered).controlSize(.small)
             }
-            
+
             Button { viewModel.exportTiles() } label: {
                 Label("Export", systemImage: "square.and.arrow.down").font(.callout)
             }.buttonStyle(.bordered).controlSize(.small).disabled(viewModel.tiles.isEmpty)
-            
+
+            Button { viewModel.showPreviewOverlay = true } label: {
+                Label("Preview", systemImage: "eye").font(.callout)
+            }.buttonStyle(.bordered).controlSize(.small).disabled(viewModel.tiles.isEmpty)
+
             Button { viewModel.applyWallpapers() } label: {
                 Label("Apply Wallpapers", systemImage: "desktopcomputer").font(.callout.weight(.semibold))
             }.buttonStyle(.borderedProminent).controlSize(.small).disabled(viewModel.tiles.isEmpty)
