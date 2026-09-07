@@ -4,14 +4,14 @@ class WallpaperService {
     
     static var wallpaperDirectory: URL {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport.appendingPathComponent("ImageSplitter/Wallpapers", isDirectory: true)
+        let dir = appSupport.appendingPathComponent("WallSplit/Wallpapers", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }
     
     static var presetsDirectory: URL {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport.appendingPathComponent("ImageSplitter/Presets", isDirectory: true)
+        let dir = appSupport.appendingPathComponent("WallSplit/Presets", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }
@@ -56,146 +56,53 @@ class WallpaperService {
             }
         }
 
-        // Pass 2: System Events — couvre TOUS les Spaces de chaque écran,
-        // y compris les bureaux virtuels supplémentaires.
-        // Pour les écrans en plein écran, met à jour le bureau caché derrière
-        // l'app : le changement sera visible dès la sortie du plein écran.
-        let desktopNames = getDesktopNames()
-        print("📋 SE desktops: \(desktopNames)")
-        var scriptLines: [String] = ["tell application \"System Events\""]
-
-        for (dIdx, dName) in desktopNames.enumerated() {
-            let dNum = dIdx + 1
-            let dBase = baseName(dName)
-
-            for (tileIndex, tile) in tiles.enumerated() {
-                guard let sInfo = screenInfos.first(where: { $0.id == tile.screenId }),
-                      let nsIdx = sInfo.nsScreenIndex, nsIdx < nsScreens.count else { continue }
-                let screenBase = baseName(nsScreens[nsIdx].localizedName)
-                if namesMatchBase(dBase, screenBase) {
-                    let fileURL = savedURLs[tileIndex]
-                    scriptLines.append("    tell desktop \(dNum)")
-                    scriptLines.append("        set picture to \"\(fileURL.path)\"")
-                    scriptLines.append("    end tell")
-                    print("🖥️ Desktop \(dNum) (\(dName)) → \(fileURL.lastPathComponent)")
-                    break
-                }
-            }
-        }
-
-        scriptLines.append("end tell")
-        _ = runAppleScript(scriptLines.joined(separator: "\n"))
-
-        // Redémarrer le Dock pour propager les changements à tous les Spaces
-        if appliedCount > 0 {
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
-                let p = Process()
-                p.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
-                p.arguments = ["Dock"]
-                try? p.run()
-                p.waitUntilExit()
-                print("✅ Dock restarted")
-            }
-        }
-
         let result = ApplyResult(applied: appliedCount, skipped: skippedCount)
         return (appliedCount + skippedCount) > 0 ? .success(result) : .failure(.applyFailed)
     }
     
     // MARK: - Test Mapping
-    
-    /// Generate numbered test images and apply them to identify which desktop is which
+
+    /// Apply a distinct solid-color image per screen to identify which screen is which.
+    /// Sandbox-safe: uses NSWorkspace only, no osascript.
     static func testMapping() {
         let nsScreens = NSScreen.screens
-        let desktopNames = getDesktopNames()
-        let mapping = buildDesktopMapping(nsScreens: nsScreens, desktopNames: desktopNames)
-        
-        print("🧪 Testing mapping: \(mapping)")
-        print("🧪 Desktops: \(desktopNames)")
-        
-        var scriptLines: [String] = []
-        
-        // Generate a test image for each desktop
-        let tempDir = URL(fileURLWithPath: "/tmp/ImageSplitter_test")
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent("WallSplit_test")
         try? FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
-        
-        // Finder amorce
-        let amorcePath = tempDir.appendingPathComponent("amorce.png")
-        generateTestImage(number: 0, label: "TEST", size: NSSize(width: 800, height: 600), saveTo: amorcePath)
-        
-        scriptLines.append("tell application \"Finder\"")
-        scriptLines.append("    set desktop picture to POSIX file \"\(amorcePath.path)\"")
-        scriptLines.append("end tell")
-        scriptLines.append("delay 1")
-        scriptLines.append("tell application \"System Events\"")
-        
-        for (nsIdx, _) in nsScreens.enumerated() {
-            guard let dNum = mapping[nsIdx] else { continue }
-            let screen = nsScreens[nsIdx]
-            let label = "Desktop \(dNum)\n\(screen.localizedName)\nNSScreen[\(nsIdx)]"
-            
-            let imgPath = tempDir.appendingPathComponent("test_\(dNum).png")
-            let size = NSSize(width: screen.frame.width * screen.backingScaleFactor,
-                            height: screen.frame.height * screen.backingScaleFactor)
-            generateTestImage(number: dNum, label: label, size: size, saveTo: imgPath)
-            
-            scriptLines.append("    tell desktop \(dNum)")
-            scriptLines.append("        set picture to \"\(imgPath.path)\"")
-            scriptLines.append("    end tell")
-        }
-        
-        scriptLines.append("end tell")
-        
-        let script = scriptLines.joined(separator: "\n")
-        _ = runAppleScript(script)
-        
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) {
-            let p = Process()
-            p.executableURL = URL(fileURLWithPath: "/usr/bin/killall")
-            p.arguments = ["Dock"]
-            try? p.run()
-            p.waitUntilExit()
+
+        for (nsIdx, screen) in nsScreens.enumerated() {
+            let label = "\(screen.localizedName)\n(\(nsIdx + 1))"
+            let size = NSSize(width: max(400, screen.frame.width * screen.backingScaleFactor),
+                              height: max(300, screen.frame.height * screen.backingScaleFactor))
+            let imgPath = tempDir.appendingPathComponent("test_\(nsIdx).png")
+            generateTestImage(number: nsIdx + 1, label: label, size: size, saveTo: imgPath)
+            try? NSWorkspace.shared.setDesktopImageURL(imgPath, for: screen, options: [:])
         }
     }
-    
-    /// Generate a test image with a big number and label
+
+    /// Generate a numbered test image with a colour background.
     private static func generateTestImage(number: Int, label: String, size: NSSize, saveTo url: URL) {
         let colors: [NSColor] = [.systemBlue, .systemRed, .systemGreen, .systemOrange, .systemPurple, .systemTeal]
-        let color = colors[number % colors.count]
-        
+        let color = colors[(number - 1) % colors.count]
         let image = NSImage(size: size)
         image.lockFocus()
-        
-        // Background
         color.setFill()
         NSRect(origin: .zero, size: size).fill()
-        
-        // Big number
         let numStr = "\(number)" as NSString
         let numFont = NSFont.systemFont(ofSize: size.height * 0.5, weight: .bold)
-        let numAttrs: [NSAttributedString.Key: Any] = [
-            .font: numFont,
-            .foregroundColor: NSColor.white
-        ]
+        let numAttrs: [NSAttributedString.Key: Any] = [.font: numFont, .foregroundColor: NSColor.white]
         let numSize = numStr.size(withAttributes: numAttrs)
-        numStr.draw(at: NSPoint(x: (size.width - numSize.width) / 2, y: (size.height - numSize.height) / 2 + size.height * 0.05),
-                   withAttributes: numAttrs)
-        
-        // Label text below
+        numStr.draw(at: NSPoint(x: (size.width - numSize.width) / 2,
+                                y: (size.height - numSize.height) / 2 + size.height * 0.05),
+                    withAttributes: numAttrs)
         let labelStr = label as NSString
         let labelFont = NSFont.systemFont(ofSize: size.height * 0.04, weight: .medium)
-        let labelAttrs: [NSAttributedString.Key: Any] = [
-            .font: labelFont,
-            .foregroundColor: NSColor.white.withAlphaComponent(0.8)
-        ]
+        let labelAttrs: [NSAttributedString.Key: Any] = [.font: labelFont, .foregroundColor: NSColor.white.withAlphaComponent(0.8)]
         let labelSize = labelStr.size(withAttributes: labelAttrs)
         labelStr.draw(at: NSPoint(x: (size.width - labelSize.width) / 2, y: size.height * 0.08),
-                     withAttributes: labelAttrs)
-        
+                      withAttributes: labelAttrs)
         image.unlockFocus()
-        
-        if let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
-            let rep = NSBitmapImageRep(cgImage: cgImage)
+        if let cg = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+            let rep = NSBitmapImageRep(cgImage: cg)
             if let data = rep.representation(using: .png, properties: [:]) {
                 try? data.write(to: url, options: .atomic)
             }
@@ -343,38 +250,6 @@ class WallpaperService {
         return false
     }
     
-    // MARK: - Helpers
-    
-    static func getDesktopNames() -> [String] {
-        let p = Process()
-        p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-        p.arguments = ["-e", "tell application \"System Events\" to get name of every desktop"]
-        let out = Pipe()
-        p.standardOutput = out
-        do {
-            try p.run(); p.waitUntilExit()
-            let str = String(data: out.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)?
-                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            return str.components(separatedBy: ", ").map { $0.trimmingCharacters(in: .whitespaces) }
-        } catch { return [] }
-    }
-    
-    private static func runAppleScript(_ source: String) -> Bool {
-        let p = Process()
-        p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
-        p.arguments = ["-e", source]
-        let err = Pipe(); p.standardError = err
-        do {
-            try p.run(); p.waitUntilExit()
-            if p.terminationStatus != 0 {
-                let d = err.fileHandleForReading.readDataToEndOfFile()
-                print("⚠️ osascript: \(String(data: d, encoding: .utf8) ?? "")")
-                return false
-            }
-            return true
-        } catch { return false }
-    }
-    
     /// Apply tiles immediately to visible desktops — no AppleScript, no Dock restart.
     /// Used for real-time preview (fit/anchor changes).
     static func applyQuick(tiles: [SplitTile], screenInfos: [ScreenInfo], format: String = "png") {
@@ -400,7 +275,7 @@ class WallpaperService {
         // disque plutôt que d'utiliser son cache, même pour les écrans couverts par
         // une appli plein écran dont le fond d'écran n'était pas visible.
         let stamp = Int(Date().timeIntervalSince1970)
-        return ImageSplitterService.exportTiles(tiles, to: dir, format: format, baseName: "wallpaper_\(stamp)")
+        return WallSplitService.exportTiles(tiles, to: dir, format: format, baseName: "wallpaper_\(stamp)")
     }
     
     enum WallpaperError: LocalizedError {

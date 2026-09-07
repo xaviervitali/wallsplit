@@ -8,6 +8,7 @@ struct LibraryView: View {
     @State private var saveResult: String?
     @State private var isImporting = false
     @State private var importProgress = ""
+    @State private var isSmartImporting = false
     @State private var showClearConfirm = false
     @State private var customMinutes: String = ""
     @State private var showCustomInterval = false
@@ -52,7 +53,17 @@ struct LibraryView: View {
                     .buttonStyle(.bordered).controlSize(.small)
                 }
                 
-                // Import folder
+                // Import folder (fit + smart crop — adapts to current screens)
+                Button {
+                    importFolderSmart()
+                } label: {
+                    Label("Import Folder (Fit + Smart)…", systemImage: "sparkles.rectangle.stack")
+                        .font(.callout).frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent).controlSize(.small)
+                .disabled(isImporting || isSmartImporting)
+
+                // Import folder (manual settings)
                 Button {
                     importFolder()
                 } label: {
@@ -60,9 +71,9 @@ struct LibraryView: View {
                         .font(.callout).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered).controlSize(.small)
-                .disabled(isImporting)
-                
-                if isImporting {
+                .disabled(isImporting || isSmartImporting)
+
+                if isImporting || isSmartImporting {
                     HStack(spacing: 6) {
                         ProgressView().controlSize(.small)
                         Text(importProgress).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
@@ -225,6 +236,40 @@ struct LibraryView: View {
         viewModel.library.updateRotationInterval(minutes * 60)
         showCustomInterval = false
         customMinutes = ""
+    }
+
+    private func importFolderSmart() {
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.message = "Choose a folder — images will be split using Fit + Smart Crop on current screens"
+        panel.prompt = "Import"
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        isSmartImporting = true
+        importProgress = "Starting…"
+
+        Task {
+            let result = await viewModel.library.importFolderSmart(
+                url: url,
+                screens: viewModel.screenManager.screens,
+                boundingBox: viewModel.screenManager.boundingBox,
+                format: "png",
+                progress: { name, current, total in
+                    DispatchQueue.main.async {
+                        importProgress = "\(current)/\(total): \(name)"
+                    }
+                }
+            )
+            DispatchQueue.main.async {
+                isSmartImporting = false
+                importProgress = ""
+                saveResult = "Imported \(result.imported) wallpapers (Fit + Smart)" +
+                    (result.skipped > 0 ? " (\(result.skipped) skipped)" : "")
+            }
+        }
     }
 
     private func importFolder() {

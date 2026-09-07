@@ -12,7 +12,7 @@ class SplitterViewModel: ObservableObject {
     @Published var tiles: [SplitTile] = []
     @Published var isDragging = false
     @Published var selectedTileId: UUID?
-    @Published var fitMode: ImageSplitterService.FitMode = .fit
+    @Published var fitMode: WallSplitService.FitMode = .fit
     @Published var anchorX: CGFloat = 0.5  // 0=left, 0.5=center, 1=right
     @Published var anchorY: CGFloat = 0.5  // 0=top, 0.5=center, 1=bottom
     
@@ -74,7 +74,7 @@ class SplitterViewModel: ObservableObject {
     
     func regenerateTiles() {
         guard let image = sourceImage else { tiles = []; return }
-        tiles = ImageSplitterService.split(
+        tiles = WallSplitService.split(
             image: image, screens: screenManager.screens,
             boundingBox: screenManager.boundingBox, fitMode: fitMode,
             anchorX: anchorX, anchorY: anchorY
@@ -158,13 +158,47 @@ class SplitterViewModel: ObservableObject {
 
     func loadPreset(_ preset: Preset) {
         screenManager.screens = preset.screens
-        fitMode = ImageSplitterService.FitMode.allCases.first { $0.rawValue == preset.fitMode } ?? .fill
+        fitMode = WallSplitService.FitMode.allCases.first { $0.rawValue == preset.fitMode } ?? .fill
         if let url = presetManager.imageURL(for: preset) {
             loadImage(from: url)
         } else {
             regenerateTiles()
         }
         applyCurrentTiles()
+    }
+
+    // MARK: - Preset Rotation
+
+    @Published var autoRotatePresetsEnabled = false
+    @Published var autoRotatePresetsInterval: TimeInterval = 3600
+    private var presetRotationTimer: Timer?
+
+    func applyRandomPreset() {
+        guard !presetManager.presets.isEmpty else { return }
+        let preset = presetManager.presets.randomElement()!
+        loadPreset(preset)
+    }
+
+    func startPresetRotation() {
+        stopPresetRotation()
+        autoRotatePresetsEnabled = true
+        presetRotationTimer = Timer.scheduledTimer(withTimeInterval: autoRotatePresetsInterval, repeats: true) { [weak self] _ in
+            DispatchQueue.main.async { self?.applyRandomPreset() }
+        }
+        applyRandomPreset()
+    }
+
+    func stopPresetRotation() {
+        autoRotatePresetsEnabled = false
+        presetRotationTimer?.invalidate()
+        presetRotationTimer = nil
+    }
+
+    func updatePresetRotationInterval(_ interval: TimeInterval) {
+        autoRotatePresetsInterval = interval
+        if autoRotatePresetsEnabled {
+            startPresetRotation()
+        }
     }
     
     // MARK: - Drop
@@ -211,7 +245,7 @@ class SplitterViewModel: ObservableObject {
         panel.canCreateDirectories = true
         panel.prompt = "Export Here"
         if panel.runModal() == .OK, let url = panel.url {
-            let saved = ImageSplitterService.exportTiles(tiles, to: url, format: "png", baseName: sourceImageName.isEmpty ? "wallpaper" : sourceImageName)
+            let saved = WallSplitService.exportTiles(tiles, to: url, format: "png", baseName: sourceImageName.isEmpty ? "wallpaper" : sourceImageName)
             exportedCount = saved.count
             showExportSuccess = true
             if let first = saved.first {

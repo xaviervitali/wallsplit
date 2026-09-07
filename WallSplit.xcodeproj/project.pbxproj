@@ -1,0 +1,529 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1B37E9DD302790A300F1DC7B /* StoreKitConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 1B37E9DC302790A300F1DC7B /* StoreKitConfig.storekit */; };
+		1BEF80043028A9B400EA6351 /* UnsplashService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FEA3028A9B400EA6351 /* UnsplashService.swift */; };
+		1BEF80053028A9B400EA6351 /* WallSplitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE03028A9B400EA6351 /* WallSplitService.swift */; };
+		1BEF80063028A9B400EA6351 /* ProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE73028A9B400EA6351 /* ProManager.swift */; };
+		1BEF80073028A9B400EA6351 /* WallpaperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FED3028A9B400EA6351 /* WallpaperService.swift */; };
+		1BEF80083028A9B400EA6351 /* WallpaperPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FFD3028A9B400EA6351 /* WallpaperPreviewView.swift */; };
+		1BEF80093028A9B400EA6351 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FEF3028A9B400EA6351 /* BrowseView.swift */; };
+		1BEF800A3028A9B400EA6351 /* WallpaperLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FEC3028A9B400EA6351 /* WallpaperLibrary.swift */; };
+		1BEF800B3028A9B400EA6351 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FFA3028A9B400EA6351 /* SettingsView.swift */; };
+		1BEF800C3028A9B400EA6351 /* ScreenInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FDD3028A9B400EA6351 /* ScreenInfo.swift */; };
+		1BEF800D3028A9B400EA6351 /* ScreenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE83028A9B400EA6351 /* ScreenManager.swift */; };
+		1BEF800E3028A9B400EA6351 /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF23028A9B400EA6351 /* DropZoneView.swift */; };
+		1BEF800F3028A9B400EA6351 /* NASAAPODService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE13028A9B400EA6351 /* NASAAPODService.swift */; };
+		1BEF80103028A9B400EA6351 /* SplitterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF80023028A9B400EA6351 /* SplitterViewModel.swift */; };
+		1BEF80113028A9B400EA6351 /* PhotoLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF53028A9B400EA6351 /* PhotoLibraryView.swift */; };
+		1BEF80123028A9B400EA6351 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF33028A9B400EA6351 /* HelpView.swift */; };
+		1BEF80133028A9B400EA6351 /* WallhavenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FEB3028A9B400EA6351 /* WallhavenService.swift */; };
+		1BEF80143028A9B400EA6351 /* WallSplitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF80013028A9B400EA6351 /* WallSplitApp.swift */; };
+		1BEF80153028A9B400EA6351 /* ProUpgradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF73028A9B400EA6351 /* ProUpgradeView.swift */; };
+		1BEF80163028A9B400EA6351 /* TileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FFB3028A9B400EA6351 /* TileDetailView.swift */; };
+		1BEF80173028A9B400EA6351 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF43028A9B400EA6351 /* LibraryView.swift */; };
+		1BEF80183028A9B400EA6351 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF03028A9B400EA6351 /* ContentView.swift */; };
+		1BEF80193028A9B400EA6351 /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FFC3028A9B400EA6351 /* ToolbarView.swift */; };
+		1BEF801A3028A9B400EA6351 /* SplitTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FDE3028A9B400EA6351 /* SplitTile.swift */; };
+		1BEF801B3028A9B400EA6351 /* PresetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF63028A9B400EA6351 /* PresetsView.swift */; };
+		1BEF801C3028A9B400EA6351 /* ScreenLayoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF83028A9B400EA6351 /* ScreenLayoutView.swift */; };
+		1BEF801D3028A9B400EA6351 /* PixabayService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE53028A9B400EA6351 /* PixabayService.swift */; };
+		1BEF801E3028A9B400EA6351 /* PhotoLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE33028A9B400EA6351 /* PhotoLibraryService.swift */; };
+		1BEF801F3028A9B400EA6351 /* CurrentWallpaperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF13028A9B400EA6351 /* CurrentWallpaperView.swift */; };
+		1BEF80203028A9B400EA6351 /* PresetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE63028A9B400EA6351 /* PresetManager.swift */; };
+		1BEF80213028A9B400EA6351 /* SmartCropService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE93028A9B400EA6351 /* SmartCropService.swift */; };
+		1BEF80223028A9B400EA6351 /* PinterestService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE43028A9B400EA6351 /* PinterestService.swift */; };
+		1BEF80233028A9B400EA6351 /* ScreenListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FF93028A9B400EA6351 /* ScreenListView.swift */; };
+		1BEF80243028A9B400EA6351 /* PexelsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEF7FE23028A9B400EA6351 /* PexelsService.swift */; };
+		1BEF80253028A9B400EA6351 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BEF7FFF3028A9B400EA6351 /* Assets.xcassets */; };
+		1BEF80263028A9B400EA6351 /* settings.local.json in Resources */ = {isa = PBXBuildFile; fileRef = 1BEF7FDA3028A9B400EA6351 /* settings.local.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1B25D17E2FC367A4001DB6E9 /* WallSplit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WallSplit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B37E9DC302790A300F1DC7B /* StoreKitConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKitConfig.storekit; sourceTree = "<group>"; };
+		1BEF7FDA3028A9B400EA6351 /* settings.local.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = settings.local.json; sourceTree = "<group>"; };
+		1BEF7FDD3028A9B400EA6351 /* ScreenInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenInfo.swift; sourceTree = "<group>"; };
+		1BEF7FDE3028A9B400EA6351 /* SplitTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitTile.swift; sourceTree = "<group>"; };
+		1BEF7FE03028A9B400EA6351 /* WallSplitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallSplitService.swift; sourceTree = "<group>"; };
+		1BEF7FE13028A9B400EA6351 /* NASAAPODService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NASAAPODService.swift; sourceTree = "<group>"; };
+		1BEF7FE23028A9B400EA6351 /* PexelsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PexelsService.swift; sourceTree = "<group>"; };
+		1BEF7FE33028A9B400EA6351 /* PhotoLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryService.swift; sourceTree = "<group>"; };
+		1BEF7FE43028A9B400EA6351 /* PinterestService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinterestService.swift; sourceTree = "<group>"; };
+		1BEF7FE53028A9B400EA6351 /* PixabayService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayService.swift; sourceTree = "<group>"; };
+		1BEF7FE63028A9B400EA6351 /* PresetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetManager.swift; sourceTree = "<group>"; };
+		1BEF7FE73028A9B400EA6351 /* ProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProManager.swift; sourceTree = "<group>"; };
+		1BEF7FE83028A9B400EA6351 /* ScreenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenManager.swift; sourceTree = "<group>"; };
+		1BEF7FE93028A9B400EA6351 /* SmartCropService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCropService.swift; sourceTree = "<group>"; };
+		1BEF7FEA3028A9B400EA6351 /* UnsplashService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsplashService.swift; sourceTree = "<group>"; };
+		1BEF7FEB3028A9B400EA6351 /* WallhavenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallhavenService.swift; sourceTree = "<group>"; };
+		1BEF7FEC3028A9B400EA6351 /* WallpaperLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallpaperLibrary.swift; sourceTree = "<group>"; };
+		1BEF7FED3028A9B400EA6351 /* WallpaperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallpaperService.swift; sourceTree = "<group>"; };
+		1BEF7FEF3028A9B400EA6351 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
+		1BEF7FF03028A9B400EA6351 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1BEF7FF13028A9B400EA6351 /* CurrentWallpaperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWallpaperView.swift; sourceTree = "<group>"; };
+		1BEF7FF23028A9B400EA6351 /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
+		1BEF7FF33028A9B400EA6351 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		1BEF7FF43028A9B400EA6351 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		1BEF7FF53028A9B400EA6351 /* PhotoLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryView.swift; sourceTree = "<group>"; };
+		1BEF7FF63028A9B400EA6351 /* PresetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsView.swift; sourceTree = "<group>"; };
+		1BEF7FF73028A9B400EA6351 /* ProUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUpgradeView.swift; sourceTree = "<group>"; };
+		1BEF7FF83028A9B400EA6351 /* ScreenLayoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLayoutView.swift; sourceTree = "<group>"; };
+		1BEF7FF93028A9B400EA6351 /* ScreenListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenListView.swift; sourceTree = "<group>"; };
+		1BEF7FFA3028A9B400EA6351 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		1BEF7FFB3028A9B400EA6351 /* TileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileDetailView.swift; sourceTree = "<group>"; };
+		1BEF7FFC3028A9B400EA6351 /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
+		1BEF7FFD3028A9B400EA6351 /* WallpaperPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallpaperPreviewView.swift; sourceTree = "<group>"; };
+		1BEF7FFF3028A9B400EA6351 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1BEF80003028A9B400EA6351 /* WallSplit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WallSplit.entitlements; sourceTree = "<group>"; };
+		1BEF80013028A9B400EA6351 /* WallSplitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallSplitApp.swift; sourceTree = "<group>"; };
+		1BEF80023028A9B400EA6351 /* SplitterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitterViewModel.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1B25D17B2FC367A4001DB6E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1B25D1752FC367A4001DB6E9 = {
+			isa = PBXGroup;
+			children = (
+				1BEF80033028A9B400EA6351 /* WallSplit */,
+				1B37E9DC302790A300F1DC7B /* StoreKitConfig.storekit */,
+				1B25D17F2FC367A4001DB6E9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1B25D17F2FC367A4001DB6E9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1B25D17E2FC367A4001DB6E9 /* WallSplit.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1BEF7FDB3028A9B400EA6351 /* .claude */ = {
+			isa = PBXGroup;
+			children = (
+				1BEF7FDA3028A9B400EA6351 /* settings.local.json */,
+			);
+			path = .claude;
+			sourceTree = "<group>";
+		};
+		1BEF7FDC3028A9B400EA6351 /* {Models,Services,Views} */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "{Models,Services,Views}";
+			sourceTree = "<group>";
+		};
+		1BEF7FDF3028A9B400EA6351 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1BEF7FDD3028A9B400EA6351 /* ScreenInfo.swift */,
+				1BEF7FDE3028A9B400EA6351 /* SplitTile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1BEF7FEE3028A9B400EA6351 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1BEF7FE03028A9B400EA6351 /* WallSplitService.swift */,
+				1BEF7FE13028A9B400EA6351 /* NASAAPODService.swift */,
+				1BEF7FE23028A9B400EA6351 /* PexelsService.swift */,
+				1BEF7FE33028A9B400EA6351 /* PhotoLibraryService.swift */,
+				1BEF7FE43028A9B400EA6351 /* PinterestService.swift */,
+				1BEF7FE53028A9B400EA6351 /* PixabayService.swift */,
+				1BEF7FE63028A9B400EA6351 /* PresetManager.swift */,
+				1BEF7FE73028A9B400EA6351 /* ProManager.swift */,
+				1BEF7FE83028A9B400EA6351 /* ScreenManager.swift */,
+				1BEF7FE93028A9B400EA6351 /* SmartCropService.swift */,
+				1BEF7FEA3028A9B400EA6351 /* UnsplashService.swift */,
+				1BEF7FEB3028A9B400EA6351 /* WallhavenService.swift */,
+				1BEF7FEC3028A9B400EA6351 /* WallpaperLibrary.swift */,
+				1BEF7FED3028A9B400EA6351 /* WallpaperService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1BEF7FFE3028A9B400EA6351 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1BEF7FEF3028A9B400EA6351 /* BrowseView.swift */,
+				1BEF7FF03028A9B400EA6351 /* ContentView.swift */,
+				1BEF7FF13028A9B400EA6351 /* CurrentWallpaperView.swift */,
+				1BEF7FF23028A9B400EA6351 /* DropZoneView.swift */,
+				1BEF7FF33028A9B400EA6351 /* HelpView.swift */,
+				1BEF7FF43028A9B400EA6351 /* LibraryView.swift */,
+				1BEF7FF53028A9B400EA6351 /* PhotoLibraryView.swift */,
+				1BEF7FF63028A9B400EA6351 /* PresetsView.swift */,
+				1BEF7FF73028A9B400EA6351 /* ProUpgradeView.swift */,
+				1BEF7FF83028A9B400EA6351 /* ScreenLayoutView.swift */,
+				1BEF7FF93028A9B400EA6351 /* ScreenListView.swift */,
+				1BEF7FFA3028A9B400EA6351 /* SettingsView.swift */,
+				1BEF7FFB3028A9B400EA6351 /* TileDetailView.swift */,
+				1BEF7FFC3028A9B400EA6351 /* ToolbarView.swift */,
+				1BEF7FFD3028A9B400EA6351 /* WallpaperPreviewView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1BEF80033028A9B400EA6351 /* WallSplit */ = {
+			isa = PBXGroup;
+			children = (
+				1BEF7FDB3028A9B400EA6351 /* .claude */,
+				1BEF7FDC3028A9B400EA6351 /* {Models,Services,Views} */,
+				1BEF7FDF3028A9B400EA6351 /* Models */,
+				1BEF7FEE3028A9B400EA6351 /* Services */,
+				1BEF7FFE3028A9B400EA6351 /* Views */,
+				1BEF7FFF3028A9B400EA6351 /* Assets.xcassets */,
+				1BEF80003028A9B400EA6351 /* WallSplit.entitlements */,
+				1BEF80013028A9B400EA6351 /* WallSplitApp.swift */,
+				1BEF80023028A9B400EA6351 /* SplitterViewModel.swift */,
+			);
+			path = WallSplit;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1B25D17D2FC367A4001DB6E9 /* WallSplit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1B25D1892FC367A4001DB6E9 /* Build configuration list for PBXNativeTarget "WallSplit" */;
+			buildPhases = (
+				1B25D17A2FC367A4001DB6E9 /* Sources */,
+				1B25D17B2FC367A4001DB6E9 /* Frameworks */,
+				1B25D17C2FC367A4001DB6E9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WallSplit;
+			packageProductDependencies = (
+			);
+			productName = WallSplit;
+			productReference = 1B25D17E2FC367A4001DB6E9 /* WallSplit.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1B25D1762FC367A4001DB6E9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					1B25D17D2FC367A4001DB6E9 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = 1B25D1792FC367A4001DB6E9 /* Build configuration list for PBXProject "WallSplit" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1B25D1752FC367A4001DB6E9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1B25D17F2FC367A4001DB6E9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1B25D17D2FC367A4001DB6E9 /* WallSplit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1B25D17C2FC367A4001DB6E9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1B37E9DD302790A300F1DC7B /* StoreKitConfig.storekit in Resources */,
+				1BEF80253028A9B400EA6351 /* Assets.xcassets in Resources */,
+				1BEF80263028A9B400EA6351 /* settings.local.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1B25D17A2FC367A4001DB6E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BEF80043028A9B400EA6351 /* UnsplashService.swift in Sources */,
+				1BEF80053028A9B400EA6351 /* WallSplitService.swift in Sources */,
+				1BEF80063028A9B400EA6351 /* ProManager.swift in Sources */,
+				1BEF80073028A9B400EA6351 /* WallpaperService.swift in Sources */,
+				1BEF80083028A9B400EA6351 /* WallpaperPreviewView.swift in Sources */,
+				1BEF80093028A9B400EA6351 /* BrowseView.swift in Sources */,
+				1BEF800A3028A9B400EA6351 /* WallpaperLibrary.swift in Sources */,
+				1BEF800B3028A9B400EA6351 /* SettingsView.swift in Sources */,
+				1BEF800C3028A9B400EA6351 /* ScreenInfo.swift in Sources */,
+				1BEF800D3028A9B400EA6351 /* ScreenManager.swift in Sources */,
+				1BEF800E3028A9B400EA6351 /* DropZoneView.swift in Sources */,
+				1BEF800F3028A9B400EA6351 /* NASAAPODService.swift in Sources */,
+				1BEF80103028A9B400EA6351 /* SplitterViewModel.swift in Sources */,
+				1BEF80113028A9B400EA6351 /* PhotoLibraryView.swift in Sources */,
+				1BEF80123028A9B400EA6351 /* HelpView.swift in Sources */,
+				1BEF80133028A9B400EA6351 /* WallhavenService.swift in Sources */,
+				1BEF80143028A9B400EA6351 /* WallSplitApp.swift in Sources */,
+				1BEF80153028A9B400EA6351 /* ProUpgradeView.swift in Sources */,
+				1BEF80163028A9B400EA6351 /* TileDetailView.swift in Sources */,
+				1BEF80173028A9B400EA6351 /* LibraryView.swift in Sources */,
+				1BEF80183028A9B400EA6351 /* ContentView.swift in Sources */,
+				1BEF80193028A9B400EA6351 /* ToolbarView.swift in Sources */,
+				1BEF801A3028A9B400EA6351 /* SplitTile.swift in Sources */,
+				1BEF801B3028A9B400EA6351 /* PresetsView.swift in Sources */,
+				1BEF801C3028A9B400EA6351 /* ScreenLayoutView.swift in Sources */,
+				1BEF801D3028A9B400EA6351 /* PixabayService.swift in Sources */,
+				1BEF801E3028A9B400EA6351 /* PhotoLibraryService.swift in Sources */,
+				1BEF801F3028A9B400EA6351 /* CurrentWallpaperView.swift in Sources */,
+				1BEF80203028A9B400EA6351 /* PresetManager.swift in Sources */,
+				1BEF80213028A9B400EA6351 /* SmartCropService.swift in Sources */,
+				1BEF80223028A9B400EA6351 /* PinterestService.swift in Sources */,
+				1BEF80233028A9B400EA6351 /* ScreenListView.swift in Sources */,
+				1BEF80243028A9B400EA6351 /* PexelsService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1B25D1872FC367A4001DB6E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 225PH672YX;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1B25D1882FC367A4001DB6E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 225PH672YX;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		1B25D18A2FC367A4001DB6E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WallSplit/WallSplit.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 225PH672YX;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WallSplit;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Xavier Vitali";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "WallSplit accède à votre photothèque pour utiliser vos photos comme fond d'écran.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xaviervitali.WallSplit;
+				PRODUCT_NAME = WallSplit;
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1B25D18B2FC367A4001DB6E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WallSplit/WallSplit.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = 225PH672YX;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = WallSplit;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Xavier Vitali";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "WallSplit accède à votre photothèque pour utiliser vos photos comme fond d'écran.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xaviervitali.WallSplit;
+				PRODUCT_NAME = WallSplit;
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1B25D1792FC367A4001DB6E9 /* Build configuration list for PBXProject "WallSplit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B25D1872FC367A4001DB6E9 /* Debug */,
+				1B25D1882FC367A4001DB6E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1B25D1892FC367A4001DB6E9 /* Build configuration list for PBXNativeTarget "WallSplit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B25D18A2FC367A4001DB6E9 /* Debug */,
+				1B25D18B2FC367A4001DB6E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1B25D1762FC367A4001DB6E9 /* Project object */;
+}

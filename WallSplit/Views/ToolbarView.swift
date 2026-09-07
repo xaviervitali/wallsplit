@@ -17,7 +17,7 @@ struct ToolbarView: View {
             HStack(spacing: 5) {
                 Text("Fit:").font(.caption).foregroundStyle(.secondary)
                 Picker("", selection: $viewModel.fitMode) {
-                    ForEach(ImageSplitterService.FitMode.allCases) { Text($0.rawValue).tag($0) }
+                    ForEach(WallSplitService.FitMode.allCases) { Text($0.rawValue).tag($0) }
                 }.pickerStyle(.menu).frame(width: 160)
                 .onChange(of: viewModel.fitMode) { viewModel.regenerateAndApply() }
             }

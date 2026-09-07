@@ -42,14 +42,9 @@ struct ScreenListView: View {
                     .padding(.horizontal, 16).padding(.bottom, 4)
                 
                 Divider().padding(.vertical, 4)
-                
-                // Mapping section
+
+                // Test mapping
                 VStack(spacing: 6) {
-                    HStack {
-                        Label("Desktop Mapping", systemImage: "arrow.triangle.swap").font(.caption.weight(.semibold))
-                        Spacer()
-                    }
-                    
                     Button {
                         WallpaperService.testMapping()
                     } label: {
@@ -57,58 +52,10 @@ struct ScreenListView: View {
                             .font(.caption).frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered).controlSize(.mini)
-                    .help("Apply numbered images to identify each desktop")
-                    
-                    Button {
-                        swapQ27G4Mapping()
-                    } label: {
-                        Label("Swap external screens", systemImage: "arrow.left.arrow.right")
-                            .font(.caption).frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered).controlSize(.mini)
-                    .help("Swap the wallpaper assignment between your two external monitors")
-                    
-                    if WallpaperService.manualMappingOverrides.isEmpty {
-                        Text("Auto-detected").font(.caption2).foregroundStyle(.tertiary)
-                    } else {
-                        HStack {
-                            Text("Manual override active").font(.caption2).foregroundStyle(.orange)
-                            Spacer()
-                            Button("Reset") {
-                                WallpaperService.clearMappingOverrides()
-                            }.font(.caption2).buttonStyle(.borderless)
-                        }
-                    }
+                    .help("Apply numbered images to identify each screen")
                 }
                 .padding(.horizontal, 16).padding(.bottom, 8)
             }
-        }
-    }
-    
-    private func swapQ27G4Mapping() {
-        let nsScreens = NSScreen.screens
-        let desktopNames = WallpaperService.getDesktopNames()
-        var mapping = WallpaperService.buildDesktopMapping(nsScreens: nsScreens, desktopNames: desktopNames)
-        
-        // Find the two NSScreen indices that are external (same model, not Retina)
-        var externalIndices: [Int] = []
-        for (i, screen) in nsScreens.enumerated() {
-            if screen.backingScaleFactor == 1.0 { // external monitors typically have backing=1
-                externalIndices.append(i)
-            }
-        }
-        
-        // Swap their desktop assignments
-        if externalIndices.count == 2 {
-            let a = externalIndices[0]
-            let b = externalIndices[1]
-            let tempA = mapping[a]
-            let tempB = mapping[b]
-            mapping[a] = tempB
-            mapping[b] = tempA
-            
-            WallpaperService.manualMappingOverrides = mapping
-            print("🔄 Swapped: NSScreen[\(a)]→Desktop \(mapping[a] ?? 0), NSScreen[\(b)]→Desktop \(mapping[b] ?? 0)")
         }
     }
     

@@ -38,7 +38,7 @@ class PresetManager: ObservableObject {
     func savePreset(
         name: String,
         screens: [ScreenInfo],
-        fitMode: ImageSplitterService.FitMode,
+        fitMode: WallSplitService.FitMode,
         sourceImage: NSImage? = nil,
         sourceImageURL: URL? = nil
     ) {

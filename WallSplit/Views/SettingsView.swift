@@ -376,7 +376,7 @@ private struct AboutTab: View {
                 Image(systemName: "rectangle.split.3x1.fill")
                     .font(.system(size: 40, weight: .light))
                     .foregroundStyle(Color.accentColor)
-                Text("ImageSplitter")
+                Text("WallSplit")
                     .font(.title2.weight(.semibold))
                 Text("Split wallpapers across multiple screens")
                     .font(.callout).foregroundStyle(.secondary)

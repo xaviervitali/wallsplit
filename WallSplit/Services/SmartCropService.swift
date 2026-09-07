@@ -16,7 +16,7 @@ struct SmartCropService {
     static func suggestAnchor(
         for image: NSImage,
         canvasSize: CGSize,
-        fitMode: ImageSplitterService.FitMode
+        fitMode: WallSplitService.FitMode
     ) async -> Result? {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil),
               canvasSize.width > 0, canvasSize.height > 0
@@ -82,14 +82,14 @@ struct SmartCropService {
     /// Maps a content centroid (normalized, top-left origin) to (anchorX, anchorY)
     /// such that the crop window is centered on that point.
     ///
-    /// Derived from `computeMapping` in ImageSplitterService:
+    /// Derived from `computeMapping` in WallSplitService:
     ///   ox = excessX * anchorX,  cropWindow = [ox, ox + canW*s]
     ///   → center at cx*imgW  ↔  anchorX = (cx*imgW - canW*s/2) / excessX
     private static func mapToAnchor(
         centroid: CGPoint,
         imageSize: CGSize,
         canvasSize: CGSize,
-        fitMode: ImageSplitterService.FitMode
+        fitMode: WallSplitService.FitMode
     ) -> CGPoint {
         let imgW = imageSize.width, imgH = imageSize.height
         let canW = canvasSize.width, canH = canvasSize.height

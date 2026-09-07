@@ -36,7 +36,7 @@ class WallpaperLibrary: ObservableObject {
     
     private var libraryDir: URL {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport.appendingPathComponent("ImageSplitter/Library", isDirectory: true)
+        let dir = appSupport.appendingPathComponent("WallSplit/Library", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }
@@ -94,8 +94,10 @@ class WallpaperLibrary: ObservableObject {
                   nsIndex < nsScreens.count
             else { continue }
             
-            guard let dNum = mapping[nsIndex] else { continue }
-            
+            // Fallback sur nsIndex+1 si l'écran n'est pas dans le mapping
+            // (ex: "Displays have separate Spaces" désactivé → System Events ne voit qu'1 desktop)
+            let dNum = mapping[nsIndex] ?? (nsIndex + 1)
+
             let ext = format == "jpeg" ? "jpg" : "png"
             let safeName = tile.screenName.replacingOccurrences(of: " ", with: "_").replacingOccurrences(of: "/", with: "-")
             let filename = "\(safeName).\(ext)"
@@ -154,12 +156,20 @@ class WallpaperLibrary: ObservableObject {
                 .replacingOccurrences(of: "★", with: "")
                 .trimmingCharacters(in: .whitespaces)
 
-            // Trouver le NSScreen correspondant par nom
+            // Trouver le NSScreen correspondant par nom (exact match d'abord)
             var matchedNSIndex: Int? = nil
             for (nsIdx, nsScreen) in nsScreens.enumerated() {
                 if usedNSScreens.contains(nsIdx) { continue }
                 let nsName = nsScreen.localizedName.lowercased()
                 if nsName == cleanName || nsName.contains(cleanName) || cleanName.contains(nsName) {
+                    matchedNSIndex = nsIdx
+                    break
+                }
+            }
+
+            // Fallback : si le nom ne correspond pas, retrouver l'écran via le desktopIndex stocké
+            if matchedNSIndex == nil {
+                for (nsIdx, dNum) in mapping where dNum == file.desktopIndex && !usedNSScreens.contains(nsIdx) {
                     matchedNSIndex = nsIdx
                     break
                 }
@@ -255,14 +265,74 @@ class WallpaperLibrary: ObservableObject {
     }
     
     // MARK: - Import Folder
-    
+
+    /// Import a folder using .fit mode + smart crop per image (async)
+    func importFolderSmart(
+        url: URL,
+        screens: [ScreenInfo],
+        boundingBox: CGRect,
+        format: String,
+        progress: ((String, Int, Int) -> Void)? = nil
+    ) async -> (imported: Int, skipped: Int) {
+        let fm = FileManager.default
+        let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "tiff", "tif", "bmp", "heic", "webp"]
+
+        guard let contents = try? fm.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isRegularFileKey]) else {
+            return (0, 0)
+        }
+
+        let imageFiles = contents
+            .filter { imageExtensions.contains($0.pathExtension.lowercased()) }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+
+        guard !imageFiles.isEmpty else { return (0, 0) }
+
+        var imported = 0
+        var skipped = 0
+        let fitMode = WallSplitService.FitMode.fit
+        let canvasSize = boundingBox.size
+
+        for (index, fileURL) in imageFiles.enumerated() {
+            let fileName = fileURL.deletingPathExtension().lastPathComponent
+            progress?(fileName, index + 1, imageFiles.count)
+
+            guard let image = NSImage(contentsOf: fileURL) else {
+                skipped += 1
+                continue
+            }
+
+            let smartResult = await SmartCropService.suggestAnchor(for: image, canvasSize: canvasSize, fitMode: fitMode)
+            let anchorX = smartResult?.anchorX ?? 0.5
+            let anchorY = smartResult?.anchorY ?? 0.5
+
+            let tiles = WallSplitService.split(
+                image: image,
+                screens: screens,
+                boundingBox: boundingBox,
+                fitMode: fitMode,
+                anchorX: anchorX,
+                anchorY: anchorY
+            )
+
+            guard !tiles.isEmpty else { skipped += 1; continue }
+
+            if saveSet(name: fileName, tiles: tiles, screenInfos: screens, format: format, sourceImageURL: fileURL) {
+                imported += 1
+            } else {
+                skipped += 1
+            }
+        }
+
+        return (imported, skipped)
+    }
+
     /// Import all images from a folder: split each one and save as a set in the library
     /// Returns (imported count, skipped count)
     func importFolder(
         url: URL,
         screens: [ScreenInfo],
         boundingBox: CGRect,
-        fitMode: ImageSplitterService.FitMode,
+        fitMode: WallSplitService.FitMode,
         anchorX: CGFloat,
         anchorY: CGFloat,
         format: String,
@@ -295,7 +365,7 @@ class WallpaperLibrary: ObservableObject {
             }
             
             // Split the image
-            let tiles = ImageSplitterService.split(
+            let tiles = WallSplitService.split(
                 image: image,
                 screens: screens,
                 boundingBox: boundingBox,

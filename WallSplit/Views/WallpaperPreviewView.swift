@@ -15,38 +15,80 @@ struct WallpaperPreviewView: View {
             Divider()
             previewArea
         }
-        .frame(width: 900, height: 620)
+        .frame(width: 900, height: 660)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 
     // MARK: Header
 
     private var headerBar: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Preview").font(.headline)
-                Text("Slice boundaries — confirm before applying")
-                    .font(.caption).foregroundStyle(.secondary)
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Preview").font(.headline)
+                    Text("Adjust layout, then apply")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                let count = viewModel.screenManager.screens.count
+                Text("\(count) screen\(count != 1 ? "s" : "")")
+                    .font(.caption.monospaced()).foregroundStyle(.secondary)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Capsule().fill(.quaternary))
+
+                Button("Cancel") { viewModel.showPreviewOverlay = false }
+                    .buttonStyle(.bordered)
+
+                Button {
+                    viewModel.regenerateTiles()
+                    viewModel.showPreviewOverlay = false
+                    viewModel.applyWallpapers()
+                    onApplied?()
+                } label: {
+                    Label("Apply Wallpapers", systemImage: "desktopcomputer")
+                        .font(.callout.weight(.semibold))
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(viewModel.sourceImage == nil)
             }
-            Spacer()
-            let count = viewModel.screenManager.screens.count
-            Text("\(count) screen\(count != 1 ? "s" : "")")
-                .font(.caption.monospaced()).foregroundStyle(.secondary)
-                .padding(.horizontal, 8).padding(.vertical, 3)
-                .background(Capsule().fill(.quaternary))
-            Button("Cancel") { viewModel.showPreviewOverlay = false }
-                .buttonStyle(.bordered)
-            Button {
-                viewModel.showPreviewOverlay = false
-                viewModel.applyWallpapers()
-                onApplied?()
-            } label: {
-                Label("Apply Wallpapers", systemImage: "desktopcomputer")
-                    .font(.callout.weight(.semibold))
+            .padding(.horizontal, 20).padding(.top, 14).padding(.bottom, 10)
+
+            // Layout controls
+            HStack(spacing: 14) {
+                HStack(spacing: 5) {
+                    Text("Fit:").font(.caption).foregroundStyle(.secondary)
+                    Picker("", selection: $viewModel.fitMode) {
+                        ForEach(WallSplitService.FitMode.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 160)
+                }
+
+                if viewModel.fitMode != .stretch {
+                    AnchorPicker(anchorX: $viewModel.anchorX, anchorY: $viewModel.anchorY)
+
+                    Button {
+                        viewModel.smartCrop()
+                    } label: {
+                        if viewModel.isSmartCropping {
+                            HStack(spacing: 4) {
+                                ProgressView().controlSize(.small)
+                                Text("Analyzing…").font(.callout)
+                            }
+                        } else {
+                            Label("Smart Crop", systemImage: "sparkles.rectangle.stack").font(.callout)
+                        }
+                    }
+                    .buttonStyle(.bordered).controlSize(.small)
+                    .disabled(viewModel.isSmartCropping)
+                }
+
+                Spacer()
             }
-            .buttonStyle(.borderedProminent)
+            .padding(.horizontal, 20).padding(.bottom, 12)
         }
-        .padding(.horizontal, 20).padding(.vertical, 14)
     }
 
     // MARK: Preview area
@@ -90,7 +132,7 @@ struct SplitLinesOverlay: View {
     let image: NSImage
     let screens: [ScreenInfo]
     let boundingBox: CGRect
-    let fitMode: ImageSplitterService.FitMode
+    let fitMode: WallSplitService.FitMode
     let anchorX: CGFloat
     let anchorY: CGFloat
     let containerSize: CGSize
@@ -103,7 +145,7 @@ struct SplitLinesOverlay: View {
         return image.size
     }
 
-    // Mapping: bb coord → image pixel coord (mirrors ImageSplitterService.computeMapping)
+    // Mapping: bb coord → image pixel coord (mirrors WallSplitService.computeMapping)
     private var mapping: (sx: CGFloat, sy: CGFloat, ox: CGFloat, oy: CGFloat) {
         let iw = imgSize.width, ih = imgSize.height
         let bw = boundingBox.width, bh = boundingBox.height

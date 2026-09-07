@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Sandbox (obligatoire App Store) -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+
+    <!-- Accès aux fichiers sélectionnés par l'utilisateur (drag & drop, ouvrir fichier) -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+
+    <!-- Accès à Téléchargements -->
+    <key>com.apple.security.files.downloads.read-write</key>
+    <true/>
+
+    <!-- Network (API calls) -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+
+    <!-- Accès temporaire -->
+    <key>com.apple.security.temporary-exception.files.absolute-path.read-write</key>
+    <array>
+        <string>/tmp</string>
+        <string>/var/tmp</string>
+    </array>
+</dict>
+</plist>

@@ -1,6 +1,6 @@
 import AppKit
 
-class ImageSplitterService {
+class WallSplitService {
     
     enum FitMode: String, CaseIterable, Identifiable {
         case fill = "Fill (crop edges)"

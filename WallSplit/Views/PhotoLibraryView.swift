@@ -36,7 +36,7 @@ struct PhotoLibraryView: View {
                 .foregroundStyle(.tertiary)
             Text("Accéder à votre Photothèque")
                 .font(.title3.weight(.semibold))
-            Text("ImageSplitter a besoin d'accéder à vos photos pour les utiliser comme fond d'écran.")
+            Text("WallSplit a besoin d'accéder à vos photos pour les utiliser comme fond d'écran.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

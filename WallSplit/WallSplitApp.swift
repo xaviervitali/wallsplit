@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ImageSplitterApp: App {
+struct WallSplitApp: App {
     @StateObject private var viewModel = SplitterViewModel()
     
     var body: some Scene {
@@ -35,7 +35,7 @@ struct ImageSplitterApp: App {
             }
 
             CommandGroup(replacing: .help) {
-                Button("ImageSplitter Help") { viewModel.showHelp = true }
+                Button("WallSplit Help") { viewModel.showHelp = true }
                     .keyboardShortcut("?", modifiers: .command)
             }
         }

@@ -112,12 +112,12 @@ private struct GettingStartedContent: View {
     var body: some View {
         HelpPage(title: "Getting Started", icon: "star.circle.fill", iconColor: .yellow) {
             HelpParagraph(
-                text: "ImageSplitter takes a single image and splits it precisely across all your monitors, so the image looks seamless across your whole desk."
+                text: "WallSplit takes a single image and splits it precisely across all your monitors, so the image looks seamless across your whole desk."
             )
 
             HelpSteps(steps: [
                 ("photo.badge.plus",              "accent",  "Load an image",     "Drag & drop, press ⌘O, paste with ⌘V — or browse 6 photo sources in the Browse tab."),
-                ("display.2",                     "blue",    "Screens detected",  "ImageSplitter automatically detects all connected monitors."),
+                ("display.2",                     "blue",    "Screens detected",  "WallSplit automatically detects all connected monitors."),
                 ("aspectratio",                   "orange",  "Choose a fit mode", "Letterbox keeps the full image. Fill crops to cover every screen."),
                 ("sparkles.rectangle.stack",      "purple",  "Smart Crop",        "Click Smart Crop in the toolbar to auto-detect faces and subjects for the best cut position."),
                 ("eye",                           "teal",    "Preview",           "Click Preview to see the exact slice boundaries before committing."),
@@ -144,7 +144,7 @@ private struct LoadingImagesContent: View {
             HelpSection2(title: "Browse online sources (Pro)") {
                 HelpParagraph(text: "Use the Browse tab to search across Unsplash, Pexels, Wallhaven, Pixabay, NASA APOD, and Pinterest. Clicking a photo opens the Preview sheet so you can see the exact split before applying.")
             }
-            HelpNote(text: "After loading, ImageSplitter generates a split preview. Nothing is changed on your desktop until you confirm in the Preview sheet or click Apply Wallpapers in the toolbar.")
+            HelpNote(text: "After loading, WallSplit generates a split preview. Nothing is changed on your desktop until you confirm in the Preview sheet or click Apply Wallpapers in the toolbar.")
         }
     }
 }
@@ -165,7 +165,7 @@ private struct ScreensContent: View {
                 HelpParagraph(text: "Add virtual screens with the + button to simulate setups before buying hardware, or to create multi-panel art installations.")
             }
             HelpSection2(title: "Desktop mapping") {
-                HelpParagraph(text: "ImageSplitter automatically maps each NSScreen to the correct System Events desktop by matching their names. If the mapping is wrong, use the \"Test Mapping\" button to generate numbered test images, then swap external screens or set a manual override.")
+                HelpParagraph(text: "WallSplit automatically maps each NSScreen to the correct System Events desktop by matching their names. If the mapping is wrong, use the \"Test Mapping\" button to generate numbered test images, then swap external screens or set a manual override.")
             }
         }
     }
@@ -245,11 +245,11 @@ private struct AnchorContent: View {
 private struct ApplyingContent: View {
     var body: some View {
         HelpPage(title: "Applying Wallpapers", icon: "desktopcomputer", iconColor: .green) {
-            HelpParagraph(text: "When you click Apply Wallpapers (⌘⇧↵), ImageSplitter:")
+            HelpParagraph(text: "When you click Apply Wallpapers (⌘⇧↵), WallSplit:")
 
             VStack(alignment: .leading, spacing: 6) {
                 HelpBullet(text: "Saves a backup of your current wallpapers to the Library.")
-                HelpBullet(text: "Writes one image file per screen to ~/Library/Application Support/ImageSplitter/Wallpapers/.")
+                HelpBullet(text: "Writes one image file per screen to ~/Library/Application Support/WallSplit/Wallpapers/.")
                 HelpBullet(text: "Sets each screen's wallpaper via the native NSWorkspace API (immediate effect).")
                 HelpBullet(text: "Also updates System Events desktops via AppleScript to cover additional virtual spaces.")
                 HelpBullet(text: "Restarts the Dock after ~1 second to refresh wallpapers on all Mission Control spaces.")
@@ -258,7 +258,7 @@ private struct ApplyingContent: View {
 
             HelpSection2(title: "Permissions required") {
                 HelpParagraph(text: "The app needs Automation access to control System Events. On first use, macOS will ask for permission. If you denied it, go to:")
-                HelpCode(text: "System Settings → Privacy & Security → Automation → ImageSplitter → System Events ✓")
+                HelpCode(text: "System Settings → Privacy & Security → Automation → WallSplit → System Events ✓")
             }
 
             HelpNote(text: "The Dock briefly disappears and reappears after applying — this is expected and necessary to refresh wallpapers on all spaces.")
@@ -278,7 +278,7 @@ private struct LibraryContent: View {
             }
 
             HelpSection2(title: "Import Folder") {
-                HelpParagraph(text: "Point ImageSplitter at a folder of images and it will split each one with the current settings and save them all as individual library sets — useful for building a rotation collection in bulk.")
+                HelpParagraph(text: "Point WallSplit at a folder of images and it will split each one with the current settings and save them all as individual library sets — useful for building a rotation collection in bulk.")
             }
 
             HelpSection2(title: "Random & Auto-Rotate (Pro)") {
@@ -291,7 +291,7 @@ private struct LibraryContent: View {
                 HelpParagraph(text: "Hover over a library set — if the original image was saved with it, a pencil button appears. Click it to reload the original into the editor to adjust fit mode, anchor, Smart Crop, and re-apply.")
             }
 
-            HelpNote(text: "Library sets are stored in ~/Library/Application Support/ImageSplitter/Library/. Each set has its own folder with tile images, a thumbnail, and the original source image (when available).")
+            HelpNote(text: "Library sets are stored in ~/Library/Application Support/WallSplit/Library/. Each set has its own folder with tile images, a thumbnail, and the original source image (when available).")
         }
     }
 }
@@ -358,7 +358,7 @@ private struct BrowseContent: View {
 private struct ProContent: View {
     var body: some View {
         HelpPage(title: "Pro Version", icon: "sparkles", iconColor: .accentColor) {
-            HelpParagraph(text: "ImageSplitter is free to use with a core set of features. A one-time Pro upgrade unlocks everything permanently — no subscription.")
+            HelpParagraph(text: "WallSplit is free to use with a core set of features. A one-time Pro upgrade unlocks everything permanently — no subscription.")
 
             HelpSection2(title: "Free tier includes") {
                 VStack(alignment: .leading, spacing: 4) {
@@ -418,7 +418,7 @@ private struct TroubleshootContent: View {
         HelpPage(title: "Troubleshooting", icon: "wrench.and.screwdriver", iconColor: .gray) {
 
             HelpSection2(title: "Wallpaper doesn't update") {
-                HelpBullet(text: "Make sure the app has Automation permission: System Settings → Privacy & Security → Automation → ImageSplitter → System Events ✓")
+                HelpBullet(text: "Make sure the app has Automation permission: System Settings → Privacy & Security → Automation → WallSplit → System Events ✓")
                 HelpBullet(text: "The Dock restarts ~1 s after applying. Wait a moment.")
                 HelpBullet(text: "Try clicking Apply Wallpapers a second time.")
                 HelpBullet(text: "If only one screen doesn't update, use the \"Test Mapping\" button to verify that each screen maps to the right desktop number.")
@@ -443,7 +443,7 @@ private struct TroubleshootContent: View {
             }
 
             HelpSection2(title: "\"Could not read current wallpapers\" on backup") {
-                HelpBullet(text: "On macOS 14+, system wallpaper files may be in a protected location. This is a known limitation — the backup feature may not work for wallpapers that were never set by ImageSplitter.")
+                HelpBullet(text: "On macOS 14+, system wallpaper files may be in a protected location. This is a known limitation — the backup feature may not work for wallpapers that were never set by WallSplit.")
             }
 
             HelpSection2(title: "API key error in Browse") {
